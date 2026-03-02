@@ -1,0 +1,98 @@
+.checkout-screen { background: var(--bg); overflow-y: auto; }
+.checkout-body { padding: 0 20px 120px; display: flex; flex-direction: column; gap: 14px; }
+
+/* Disabled search */
+.search-disabled { opacity: 0.6; pointer-events: none; }
+
+/* Cart item */
+.cart-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 12px;
+}
+.ci-img-wrap { width: 80px; height: 70px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+.ci-img    { width:100%;height:100%;object-fit:cover; }
+.ci-img-ph { width:100%;height:100%;background:var(--bg2); }
+.ci-details { flex: 1; }
+.ci-name  { font-size: 15px; font-weight: 600; }
+.ci-price { font-size: 13px; color: var(--text2); margin-top: 3px; }
+.ci-size  { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.ci-qty-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.rm-btn { background: none; border: none; cursor: pointer; }
+
+.ci-qty-row { display: flex; align-items: center; gap: 10px; }
+.qty-btn-co { width: 26px; height: 26px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--border); font-size: 17px; display: flex; align-items: center; justify-content: center; }
+.qty-num-co { font-size: 14px; font-weight: 600; min-width: 16px; text-align: center; }
+
+/* Add CI link */
+.add-ci-link { background: none; border: none; font-size: 13px; color: var(--text3); text-decoration: underline; text-align: left; }
+.ci-preview  { font-size: 12px; color: var(--text2); font-style: italic; }
+
+/* Order type toggle */
+.order-type-toggle {
+  display: flex; background: var(--bg2);
+  border-radius: 50px; padding: 4px;
+}
+.ot-btn {
+  flex: 1; padding: 11px; border-radius: 50px; border: none;
+  font-size: 14px; font-weight: 500; color: var(--text2);
+  background: transparent; transition: all 0.2s;
+}
+.ot-btn.active { background: var(--bg); color: var(--text); font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+/* Bill summary */
+.bill-summary {
+  background: #FAFAF0; border-radius: 14px; padding: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.bill-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text2); }
+.bill-row.grand { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; font-size: 15px; font-weight: 700; color: var(--text); }
+
+/* Your details */
+.your-details { display: flex; flex-direction: column; gap: 10px; }
+.yd-title { font-size: 15px; font-weight: 700; }
+.yd-info  { font-size: 13px; color: var(--text2); }
+.yd-row-icon { display: flex; align-items: center; gap: 8px; }
+.yd-address  { font-size: 12px; color: var(--text2); }
+.yd-time     { font-size: 12px; color: var(--green); font-weight: 500; }
+.yd-field    { display: flex; flex-direction: column; gap: 4px; }
+.yd-field label { font-size: 12px; color: var(--text3); }
+.yd-input {
+  border: none; border-bottom: 1px solid var(--border);
+  outline: none; padding: 6px 0; font-size: 14px; background: transparent;
+}
+
+/* Swipe */
+.swipe-wrap { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 350px; }
+.swipe-track {
+  position: relative; height: 56px; background: var(--bg2);
+  border-radius: 50px; display: flex; align-items: center;
+  border: 1px solid var(--border); overflow: hidden; user-select: none;
+}
+.swipe-done { background: #E8F5E9; }
+.swipe-thumb {
+  position: absolute; left: 4px;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--text); display: flex; align-items: center; justify-content: center;
+  cursor: grab; transition: transform 0.08s;
+  z-index: 2; flex-shrink: 0;
+}
+.swipe-thumb:active { cursor: grabbing; }
+.swipe-arrow { font-size: 20px; color: #fff; font-weight: 600; }
+.swipe-label {
+  width: 100%; text-align: center; font-size: 14px;
+  color: var(--text3); pointer-events: none; font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+/* CI modal */
+.ci-title    { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+.ci-textarea {
+  width: 100%; height: 110px; border-radius: 10px;
+  border: 1.5px solid var(--border); padding: 12px;
+  font-size: 14px; resize: none; outline: none; background: var(--bg2);
+}
+.ci-textarea:focus { border-color: var(--text); }
+.ci-note { font-size: 11px; color: var(--text3); margin-top: 8px; margin-bottom: 20px; line-height: 1.5; }
+.ci-actions { display: flex; gap: 10px; }
+.ci-btn { flex: 1; text-align: center; }

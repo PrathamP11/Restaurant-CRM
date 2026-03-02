@@ -1,0 +1,95 @@
+/* shared modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bottom-sheet {
+
+  border-radius: 20px 20px 0 0;
+  padding: 28px 20px;
+  width: 100%;
+  animation: sheetUp 0.25s ease;
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%)
+  }
+
+  to {
+    transform: translateY(0)
+  }
+}
+
+/* Shared header */
+.page-header {
+  padding: 18px 20px 10px;
+}
+
+.greeting-big {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.greeting-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+/* Search bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg2);
+  border-radius: 12px;
+  padding: 11px 14px;
+  margin: 10px 20px;
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.search-bar input::placeholder {
+  color: var(--text3);
+}
+
+.search-bar img {
+  opacity: 0.45;
+}
+
+/* Btn */
+.btn-round {
+  border-radius: 50px;
+  border: none;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.btn-dark-r {
+  background: #1A1A1A;
+  color: #fff;
+}
+
+.btn-light-r {
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}

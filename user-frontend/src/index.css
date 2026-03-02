@@ -1,0 +1,78 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #FFFFFF;
+  --bg2: #F5F5F5;
+  --border: #EBEBEB;
+  --text: #1A1A1A;
+  --text2: #666666;
+  --text3: #AAAAAA;
+  --accent: #1A1A1A;
+  --green: #4CAF50;
+  --red: #F44336;
+  --radius: 14px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #E0E0E0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 390px;
+  min-height: 100vh;
+
+  position: relative;
+  overflow: hidden;
+}
+
+button {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font-family: 'Inter', sans-serif;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.ico {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.ico-sm {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.ico-lg {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
