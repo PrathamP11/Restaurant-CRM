@@ -5,7 +5,7 @@ const CartContext = createContext();
 
 const API = "http://localhost:5000/api";
 
-export const CATEGORIES = ["All", "Burger", "Pizza", "Drink", "French fries", "Veggies"];
+export const CATEGORIES = ["Burger", "Pizza", "Drink", "French fries", "Veggies"];
 
 export function CartProvider({ children }) {
   const [menu,    setMenu]    = useState([]);

@@ -118,7 +118,7 @@
 /* Input */
 .input {
   width: 100%;
-  background: #F0EEF9;
+  background: #e9e1f3;
   border: none;
   border-radius: 8px;
   padding: 11px 14px;
@@ -194,7 +194,7 @@
 .form-label {
   display: block;
   font-size: 13px;
-  color: var(--text2);
+  color: black;
   margin-bottom: 6px;
   font-weight: 500;
 }

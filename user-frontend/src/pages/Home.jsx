@@ -4,8 +4,8 @@ import "./Home.css";
 
 /* ─── Login Modal ─── */
 function LoginModal({ onSubmit }) {
-  const [form, setForm] = useState({ name:"", persons:"", address:"", contact:"" });
-  const set = (k,v) => setForm(p=>({...p,[k]:v}));
+  const [form, setForm] = useState({ name: "", persons: "", address: "", contact: "" });
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleSubmit = () => {
     if (!form.name || !form.contact) return alert("Name and contact are required.");
@@ -18,19 +18,19 @@ function LoginModal({ onSubmit }) {
         <h3 className="login-title">Enter Your Details</h3>
         <div className="lm-field">
           <label>Name</label>
-          <input className="lm-input" placeholder="full name" value={form.name} onChange={e=>set("name",e.target.value)} />
+          <input className="lm-input" placeholder="full name" value={form.name} onChange={e => set("name", e.target.value)} />
         </div>
         <div className="lm-field">
           <label>Number of Person</label>
-          <input className="lm-input active" placeholder="1-4" type="number" value={form.persons} onChange={e=>set("persons",e.target.value)} />
+          <input className="lm-input active" placeholder="1-8" type="number" value={form.persons} onChange={e => set("persons", e.target.value)} />
         </div>
         <div className="lm-field">
           <label>Address</label>
-          <input className="lm-input" placeholder="address" value={form.address} onChange={e=>set("address",e.target.value)} />
+          <input className="lm-input" placeholder="address" value={form.address} onChange={e => set("address", e.target.value)} />
         </div>
         <div className="lm-field">
           <label>Contact</label>
-          <input className="lm-input" placeholder="phone" value={form.contact} onChange={e=>set("contact",e.target.value)} />
+          <input className="lm-input" placeholder="phone" value={form.contact} onChange={e => set("contact", e.target.value)} />
         </div>
         <button className="btn-round btn-dark-r login-btn" onClick={handleSubmit}>
           Order Now
@@ -43,13 +43,13 @@ function LoginModal({ onSubmit }) {
 /* ─── Category pill ─── */
 function CategoryPill({ cat, active, onClick }) {
   const iconMap = {
-    "All":"all", "Burger":"burger", "Pizza":"pizza",
-    "Drink":"drink", "French fries":"fries", "Veggies":"veggies"
+    "Burger": "burger", "Pizza": "pizza",
+    "Drink": "drink", "French fries": "fries", "Veggies": "veggies"
   };
   return (
-    <button className={`cat-pill ${active?"active":""}`} onClick={onClick}>
+    <button className={`cat-pill ${active ? "active" : ""}`} onClick={onClick}>
       <div className="cat-icon-wrap">
-        <img src={`/icons/${iconMap[cat]||"all"}.png`} alt={cat} className="ico" />
+        <img src={`/icons/${iconMap[cat] || "all"}.png`} alt={cat} className="ico" />
       </div>
       <span>{cat}</span>
     </button>
@@ -91,9 +91,9 @@ const PAGE_SIZE = 6;
 
 export default function Home({ onNext }) {
   const { user, setUser, cartCount, menu, loadingMenu } = useCart();
-  const [category,  setCategory]    = useState("All");
-  const [search,    setSearch]      = useState("");
-  const [visibleN,  setVisibleN]    = useState(PAGE_SIZE);
+  const [category, setCategory] = useState(null);
+  const [search, setSearch] = useState("");
+  const [visibleN, setVisibleN] = useState(PAGE_SIZE);
   const loaderRef = useRef();
 
   const getGreeting = () => {
@@ -106,7 +106,7 @@ export default function Home({ onNext }) {
   // Filter items (search crosses all categories)
   const filtered = menu.filter(m => {
     const matchSearch = !search || m.name.toLowerCase().includes(search.toLowerCase());
-    const matchCat    = category === "All" || m.category === category;
+    const matchCat = !category || m.category === category;
     return search ? matchSearch : matchCat && matchSearch;
   });
 
@@ -126,7 +126,7 @@ export default function Home({ onNext }) {
   // Reset visible on filter change
   useEffect(() => { setVisibleN(PAGE_SIZE); }, [category, search]);
 
-  const catTitle = category === "All" ? (search ? "Results" : "All Items") : category;
+  const catTitle = !category ? (search ? "Results" : "All Items") : category;
 
   return (
     <div className="screen home-screen">
@@ -137,7 +137,7 @@ export default function Home({ onNext }) {
       </div>
 
       {/* Search */}
-      <div className={`search-bar ${!user?"blurred-search":""}`}>
+      <div className={`search-bar ${!user ? "blurred-search" : ""}`}>
         <img src="/icons/search.png" alt="search" className="ico-sm" />
         <input
           placeholder="Search"
@@ -150,7 +150,7 @@ export default function Home({ onNext }) {
       {/* Categories (horizontal scroll) */}
       <div className="cats-row">
         {CATEGORIES.map(c => (
-          <CategoryPill key={c} cat={c} active={category===c} onClick={() => setCategory(c)} />
+          <CategoryPill key={c} cat={c} active={category === c} onClick={() => setCategory(category === c ? null : c)} />
         ))}
       </div>
 
