@@ -4,16 +4,19 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(6px);
+  
   z-index: 200;
   display: flex;
   align-items: flex-end;
+  justify-content: center;
 }
 
 .bottom-sheet {
-
+  background: #f0f5f3;
   border-radius: 20px 20px 0 0;
   padding: 28px 20px;
   width: 100%;
+  max-width: 390px;
   animation: sheetUp 0.25s ease;
 }
 
@@ -49,10 +52,10 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg2);
-  border-radius: 12px;
+  background: #f0f5f3;
+  border-radius: 6px;
   padding: 11px 14px;
-  margin: 10px 20px;
+  margin: 10px 20px 0;
 }
 
 .search-bar input {
@@ -72,6 +75,8 @@
   opacity: 0.45;
 }
 
+
+
 /* Btn */
 .btn-round {
   border-radius: 50px;
@@ -84,12 +89,18 @@
 }
 
 .btn-dark-r {
-  background: #1A1A1A;
+  background: #505050;
   color: #fff;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 12px 0;
+
 }
 
 .btn-light-r {
-  background: var(--bg2);
-  color: var(--text);
-  border: 1px solid var(--border);
+  background: #f0f5f3;
+  color: #505050;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 12px 0;
 }

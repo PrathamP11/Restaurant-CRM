@@ -50,8 +50,8 @@ function CategoryPill({ cat, active, onClick }) {
     <button className={`cat-pill ${active ? "active" : ""}`} onClick={onClick}>
       <div className="cat-icon-wrap">
         <img src={`/icons/${iconMap[cat] || "all"}.png`} alt={cat} className="ico" />
+        <span className="cat-label">{cat}</span>
       </div>
-      <span>{cat}</span>
     </button>
   );
 }
@@ -164,7 +164,7 @@ export default function Home({ onNext }) {
       </div>
 
       {/* Next button */}
-      {cartCount > 0 && (
+      {cartCount >= 0 && (
         <div className="next-bar">
           <button className="btn-round btn-dark-r next-btn" onClick={onNext}>
             Next
