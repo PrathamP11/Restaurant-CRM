@@ -153,11 +153,12 @@
 /* Bill summary */
 .bill-summary {
   background: #FAFAF0;
-  border-radius: 14px;
-  padding: 16px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-left: -20px;
+  margin-right: -20px;
 }
 
 .bill-row {

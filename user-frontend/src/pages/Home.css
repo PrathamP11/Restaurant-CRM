@@ -260,6 +260,9 @@
 .next-btn {
   padding: 12px 32px;
   font-size: 14px;
+  background: #616161;
+  color: #fff;
+  border-radius: 10px;
 }
 
 /* Blur search when no user */

@@ -79,9 +79,9 @@
 
 /* Btn */
 .btn-round {
-  border-radius: 50px;
+  border-radius: 10px;
   border: none;
-  padding: 12px 28px;
+  padding: 12px 26px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -91,16 +91,12 @@
 .btn-dark-r {
   background: #505050;
   color: #fff;
-  border-radius: 10px;
   margin: 10px;
-  padding: 12px 0;
 
 }
 
 .btn-light-r {
   background: #f0f5f3;
   color: #505050;
-  border-radius: 10px;
   margin: 10px;
-  padding: 12px 0;
 }

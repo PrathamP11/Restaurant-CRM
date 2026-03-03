@@ -166,7 +166,7 @@ export default function Home({ onNext }) {
       {/* Next button */}
       {cartCount >= 0 && (
         <div className="next-bar">
-          <button className="btn-round btn-dark-r next-btn" onClick={onNext}>
+          <button className="btn-round next-btn" onClick={onNext}>
             Next
           </button>
         </div>
