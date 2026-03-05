@@ -11,13 +11,6 @@
   --bg2: #F5F5F5;
   --border: #EBEBEB;
   --text: #1A1A1A;
-  --text2: #666666;
-  --text3: #AAAAAA;
-  --accent: #1A1A1A;
-  --green: #4CAF50;
-  --red: #F44336;
-  --radius: 14px;
-  --shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
 }
 
 body {
@@ -60,9 +53,10 @@ select {
 }
 
 .ico-sm {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
+  
 }
 
 .ico-lg {

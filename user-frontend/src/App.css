@@ -4,7 +4,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(6px);
-  
+
   z-index: 200;
   display: flex;
   align-items: flex-end;
@@ -38,12 +38,12 @@
 .greeting-big {
   font-size: 22px;
   font-weight: 700;
-  color: var(--text);
+  color: black;
 }
 
 .greeting-sub {
   font-size: 13px;
-  color: var(--text2);
+  color: black;
   margin-top: 2px;
 }
 
@@ -64,17 +64,16 @@
   outline: none;
   background: transparent;
   font-size: 14px;
-  color: var(--text);
+  color: black;
 }
 
 .search-bar input::placeholder {
-  color: var(--text3);
+  color: #a7a9a9;
 }
 
 .search-bar img {
   opacity: 0.45;
 }
-
 
 
 /* Btn */

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import "./Checkout.css";
 
@@ -49,7 +49,7 @@ function SwipeToOrder({ onSwipe, disabled }) {
     >
       <div className="swipe-thumb" style={{ transform: `translateX(${offset}px)` }}
         onMouseDown={e => onStart(e.clientX)} onTouchStart={e => onStart(e.touches[0].clientX)}>
-        <span className="swipe-arrow">{disabled ? "..." : "→"}</span>
+        <span className="swipe-arrow">{disabled ? "..." : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>}</span>
       </div>
       <span className="swipe-label" style={{ opacity: done ? 0 : 1 - offset / THRESHOLD * 0.8 }}>
         {disabled ? "Placing order..." : "Swipe to Order"}
@@ -59,22 +59,28 @@ function SwipeToOrder({ onSwipe, disabled }) {
 }
 
 export default function Checkout({ onOrder, onBack }) {
-  const { cartItems, cartTotal, user, removeItem, addItem, placeOrder, tables } = useCart();
+  const { cartItems, cartTotal, user, removeItem, deleteItem, addItem, placeOrder, tables, fetchTables } = useCart();
   const [orderType, setOrderType] = useState("dine-in");
   const [showCI, setShowCI] = useState(false);
   const [instructions, setInst] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const availableTable = tables.find(t => !t.isReserved);
   const deliveryTime = 42;
+
+  // Refresh tables every time checkout opens
+  useEffect(() => { fetchTables(); }, []);
 
   const handleSwipe = async () => {
     if (submitting) return;
     setSubmitting(true);
     try {
+      // Re-fetch tables to get current reservation status
+      const freshTables = await fetchTables();
+      const available = freshTables.filter(t => !t.isReserved);
+      const freshTable = available[Math.floor(Math.random() * available.length)];
       await placeOrder({
         type: orderType,
-        tableId: orderType === "dine-in" ? availableTable?._id : null,
+        tableId: orderType === "dine-in" ? freshTable?._id : null,
         customerName: user?.name || "Guest",
         phone: user?.contact || "",
         address: user?.address || "",
@@ -96,7 +102,7 @@ export default function Checkout({ onOrder, onBack }) {
       </div>
 
       {/* Search (disabled on checkout) */}
-      <div className="search-bar search-disabled">
+      <div className="search-bar search-disabled" style={{ marginBottom: "14px" }}>
         <img src="/icons/search.png" alt="search" className="ico-sm" />
         <input placeholder="Search" disabled />
       </div>
@@ -107,20 +113,18 @@ export default function Checkout({ onOrder, onBack }) {
         {cartItems.map(({ item, qty }) => (
           <div key={item._id} className="cart-item">
             <div className="ci-img-wrap">
-              {item.image ? <img src={item.image} alt={item.name} className="ci-img" /> : <div className="ci-img-ph" />}
+              {item.image ? <img src={`http://localhost:5000${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="ci-img" /> : <div className="ci-img-ph" />}
             </div>
             <div className="ci-details">
               <p className="ci-name">{item.name}</p>
               <p className="ci-price">₹ {item.price}</p>
             </div>
             <div className="ci-qty-side">
-              <button className="rm-btn" onClick={() => removeItem(item._id)}>
-                <img src="/icons/close-red.png" alt="remove" className="ico-sm" />
-              </button>
+              <button className="rm-btn" onClick={() => deleteItem(item._id)}><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></button>
               <div className="ci-qty-row">
-                <button className="qty-btn-co" onClick={() => removeItem(item._id)}>−</button>
+                <button className="qty-btn-co" disabled={qty <= 1} style={qty <= 1 ? { opacity: 0.4 } : {}} onClick={() => qty > 1 && removeItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></button>
                 <span className="qty-num-co">{qty}</span>
-                <button className="qty-btn-co" onClick={() => addItem(item._id)}>+</button>
+                <button className="qty-btn-co" onClick={() => addItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></button>
               </div>
             </div>
           </div>
@@ -154,16 +158,16 @@ export default function Checkout({ onOrder, onBack }) {
           <p className="yd-info">{user?.name || "Guest"}, {user?.contact || "N/A"}</p>
 
           {orderType === "takeaway" && (
-            <>
+            <div style={{ borderBottom: "2px solid #e5e5e5", marginBottom: "10px" }}>
               <div className="yd-row-icon">
                 <img src="/icons/location.png" alt="loc" className="ico-sm" />
-                <span className="yd-address">{user?.address || "No address provided"}</span>
+                <span className="yd-address">Delivery at Home - {user?.address || "No address provided"}</span>
               </div>
               <div className="yd-row-icon">
                 <img src="/icons/clock.png" alt="time" className="ico-sm" />
-                <span className="yd-time">Delivery in {deliveryTime} mins</span>
+                <span className="yd-time">Delivery in <span style={{ fontWeight: "bold" }}>{deliveryTime} mins</span></span>
               </div>
-            </>
+            </div>
           )}
         </div>
 

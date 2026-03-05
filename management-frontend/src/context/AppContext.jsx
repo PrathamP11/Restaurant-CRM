@@ -15,6 +15,12 @@ export function AppProvider({ children }) {
 
   useEffect(() => { fetchAll(); }, []);
 
+  // Poll orders and tables every 5 seconds
+  useEffect(() => {
+    const t = setInterval(() => { fetchOrders(); fetchTables(); }, 5000);
+    return () => clearInterval(t);
+  }, []);
+
   const fetchAll = async () => {
     setLoading(true);
     try {
@@ -88,7 +94,7 @@ export function AppProvider({ children }) {
       addMenuItem, deleteMenuItem, reorderMenu,
       addTable, deleteTable,
       updateOrderStatus,
-      fetchAnalytics, fetchRevenue, fetchOrders,
+      fetchAnalytics, fetchRevenue, fetchOrders, fetchTables,
       totalRevenue: analytics.totalRevenue,
       totalOrders:  analytics.totalOrders,
       totalClients: analytics.totalClients,

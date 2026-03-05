@@ -30,18 +30,10 @@
   gap: 10px;
   background: #FFFFFF;
   border-radius: 50px;
-  padding: 6px 14px;
+  padding: 16px 14px;
   width: 350px;
 }
 
-.filter-chevron {
-  border-radius: 50%;
-  background-color: #F0F5F3;
-  padding: 5px;
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
-}
 
 .filter-input {
   flex: 1;
@@ -54,11 +46,13 @@
 
 .filter-input::placeholder {
   color: #AFABAF;
+  padding-left: 10px;
 }
 
 .page-content {
   flex: 1;
   padding: 0 32px 32px;
+  overflow: hidden;
 }
 
 /* Shared card */
@@ -69,12 +63,6 @@
   box-shadow: var(--shadow);
 }
 
-/* Section title */
-.section-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: #565656;
-}
 
 /* Button */
 .btn {

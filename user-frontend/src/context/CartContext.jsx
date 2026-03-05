@@ -35,8 +35,10 @@ export function CartProvider({ children }) {
     try {
       const res = await axios.get(`${API}/tables`);
       setTables(res.data);
+      return res.data;
     } catch (err) {
       console.error("Failed to fetch tables:", err.message);
+      return tables;
     }
   };
 
@@ -45,6 +47,7 @@ export function CartProvider({ children }) {
     if ((p[id] || 0) <= 1) { const n = { ...p }; delete n[id]; return n; }
     return { ...p, [id]: p[id] - 1 };
   });
+  const deleteItem = (id) => setCart(p => { const n = { ...p }; delete n[id]; return n; });
   const clearCart  = () => setCart({});
 
   const cartItems = Object.entries(cart)
@@ -77,10 +80,10 @@ export function CartProvider({ children }) {
     <CartContext.Provider value={{
       menu, tables, loadingMenu,
       cart, cartItems, cartTotal, cartCount,
-      addItem, removeItem, clearCart,
+      addItem, removeItem, deleteItem, clearCart,
       user, setUser,
       orderInstructions, setOrderInstructions,
-      placeOrder,
+      placeOrder, fetchTables,
     }}>
       {children}
     </CartContext.Provider>

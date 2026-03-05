@@ -26,17 +26,19 @@ export default function App() {
       <div className="app-shell">
         <Sidebar activePage={page} onNavigate={setPage} />
         <div className="main-area">
-          <div className="top-bar">
-            <div className="filter-wrap">
-              <input
-                className="filter-input"
-                placeholder="Filter..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-              />
-              <img src="/icons/chevron-down.png" alt="down" className="filter-chevron" />
+          {page !== "tables" && page !== "orders" && (
+            <div className="top-bar">
+              <div className="filter-wrap">
+                <input
+                  className="filter-input"
+                  placeholder="Filter..."
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                />
+
+              </div>
             </div>
-          </div>
+          )}
           <main className="page-content">{renderPage()}</main>
         </div>
       </div>

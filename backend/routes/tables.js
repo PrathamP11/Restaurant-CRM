@@ -1,10 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const Table = require('../models/Table');
+const Order = require('../models/Order');
 
-// GET all tables
+// GET all tables — sync reservation status with active orders
 router.get('/', async (req, res) => {
   try {
+    // Find tables that actually have active (processing) dine-in orders
+    const activeOrders = await Order.find({ type: 'dine-in', status: 'processing' });
+    const activeTableIds = new Set(activeOrders.map(o => o.tableId?.toString()).filter(Boolean));
+
+    // Unreserve tables with no active orders, reserve ones that do
+    await Table.updateMany(
+      { _id: { $nin: [...activeTableIds] } },
+      { isReserved: false }
+    );
+
     const tables = await Table.find().sort({ tableNumber: 1 });
     res.json(tables);
   } catch (err) {

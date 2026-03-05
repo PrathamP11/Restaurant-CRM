@@ -32,7 +32,7 @@ function LoginModal({ onSubmit }) {
           <label>Contact</label>
           <input className="lm-input" placeholder="phone" value={form.contact} onChange={e => set("contact", e.target.value)} />
         </div>
-        <button className="btn-round btn-dark-r login-btn" onClick={handleSubmit}>
+        <button className="btn-round login-btn" onClick={handleSubmit}>
           Order Now
         </button>
       </div>
@@ -64,7 +64,7 @@ function ItemCard({ item }) {
     <div className="item-card">
       <div className="item-img-box">
         {item.image
-          ? <img src={item.image} alt={item.name} className="item-img" />
+          ? <img src={`http://localhost:5000${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="item-img" />
           : <div className="item-img-ph" />
         }
       </div>
@@ -73,13 +73,13 @@ function ItemCard({ item }) {
         <p className="item-price">₹ {item.price}</p>
         {qty === 0 ? (
           <button className="item-add-btn" onClick={() => addItem(item._id)}>
-            <span>+</span>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
           </button>
         ) : (
           <div className="item-qty-row">
-            <button className="qty-btn" onClick={() => removeItem(item._id)}>−</button>
+            <button className="qty-btn" onClick={() => removeItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></button>
             <span className="qty-num">{qty}</span>
-            <button className="qty-btn" onClick={() => addItem(item._id)}>+</button>
+            <button className="qty-btn" onClick={() => addItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></button>
           </div>
         )}
       </div>
@@ -158,13 +158,13 @@ export default function Home({ onNext }) {
       <div className="home-items-wrap">
         <h3 className="home-section-title">{catTitle}</h3>
         <div className="items-grid">
-          {visible.map(item => <ItemCard key={item.id} item={item} />)}
+          {visible.map(item => <ItemCard key={item._id} item={item} />)}
         </div>
         {hasMore && <div ref={loaderRef} className="load-more-trigger" />}
       </div>
 
       {/* Next button */}
-      {cartCount >= 0 && (
+      {cartCount > 0 && (
         <div className="next-bar">
           <button className="btn-round next-btn" onClick={onNext}>
             Next

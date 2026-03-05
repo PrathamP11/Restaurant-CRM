@@ -23,23 +23,25 @@
   align-items: flex-start;
   gap: 14px;
   background: var(--bg);
-  border: 1.5px solid var(--border);
   border-radius: 14px;
-  padding: 12px;
+  padding: 8px;
 }
 
 .ci-img-wrap {
-  width: 80px;
-  height: 70px;
-  border-radius: 10px;
-  overflow: hidden;
+  width: 110px;
+  height: 80px;
+  overflow: visible;
   flex-shrink: 0;
+  border-radius: 10px;
 }
 
 .ci-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border: 3px solid #d9d9d9;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .ci-img-ph {
@@ -59,27 +61,29 @@
 
 .ci-price {
   font-size: 13px;
-  color: var(--text2);
+  color: black;
   margin-top: 3px;
-}
-
-.ci-size {
-  font-size: 12px;
-  color: var(--text3);
-  margin-top: 2px;
 }
 
 .ci-qty-side {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 8px;
+  justify-content: space-between;
+  align-self: stretch;
 }
 
 .rm-btn {
-  background: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e53935;
+  color: white;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ci-qty-row {
@@ -91,9 +95,9 @@
 .qty-btn-co {
   width: 26px;
   height: 26px;
-  border-radius: 50%;
-  background: var(--bg2);
-  border: 1px solid var(--border);
+  border-radius: 20%;
+  background: #FFF;
+  border: 2px solid #d9d9d9;
   font-size: 17px;
   display: flex;
   align-items: center;
@@ -119,7 +123,7 @@
 
 .ci-preview {
   font-size: 12px;
-  color: var(--text2);
+  color: #757575;
   font-style: italic;
 }
 
@@ -159,6 +163,7 @@
   gap: 8px;
   margin-left: -20px;
   margin-right: -20px;
+  border-bottom: 2px solid #e5e5e5;
 }
 
 .bill-row {
@@ -169,12 +174,11 @@
 }
 
 .bill-row.grand {
-  border-top: 1px solid var(--border);
   padding-top: 10px;
   margin-top: 4px;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text);
+  color: black;
 }
 
 /* Your details */
@@ -182,22 +186,29 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-bottom: 10px;
 }
 
 .yd-title {
   font-size: 15px;
   font-weight: 700;
+  padding: 0 20px;
 }
 
 .yd-info {
   font-size: 13px;
-  color: var(--text2);
+  color: black;
+  padding: 0 20px 10px;
+  border-bottom: 2px solid #e5e5e5;
 }
 
 .yd-row-icon {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 0 20px;
 }
 
 .yd-address {
@@ -206,21 +217,11 @@
 }
 
 .yd-time {
+  line-height: 3.5;
   font-size: 12px;
   color: black;
-  font-weight: 500;
 }
 
-.yd-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.yd-field label {
-  font-size: 12px;
-  color: var(--text3);
-}
 
 .yd-input {
   border: none;
@@ -232,23 +233,33 @@
 }
 
 /* Swipe */
+
 .swipe-wrap {
   position: fixed;
-  bottom: 20px;
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 40px);
+  width: 100%;
+  max-width: 390px;
+  padding: 16px 20px 24px;
+  background: linear-gradient(transparent, var(--bg) 10%);
+  display: flex;
+  justify-content: center;
+}
+
+.swipe-wrap .swipe-track {
+  width: 100%;
   max-width: 350px;
 }
 
 .swipe-track {
   position: relative;
-  height: 56px;
-  background: var(--bg2);
+  height: 60px;
+  background: #FFF;
   border-radius: 50px;
   display: flex;
   align-items: center;
-  border: 1px solid var(--border);
+  border: 1px solid #c7c7c7;
   overflow: hidden;
   user-select: none;
 }
@@ -263,7 +274,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--text);
+  background: #d9d9d9;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -278,18 +289,18 @@
 }
 
 .swipe-arrow {
-  font-size: 20px;
-  color: #fff;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .swipe-label {
   width: 100%;
   text-align: center;
-  font-size: 14px;
-  color: var(--text3);
+  font-size: 16px;
+  color: #8f908f;
   pointer-events: none;
-  font-weight: 500;
+  font-weight: 300;
   transition: opacity 0.15s;
 }
 

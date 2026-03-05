@@ -21,7 +21,7 @@
 .menu-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 14px;
   padding: 14px;
   cursor: grab;
   transition: all 0.18s;
@@ -53,7 +53,7 @@
   width: 820px;
   max-width: 96vw;
   background: var(--bg);
-  border-radius: var(--radius);
+  border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 24px 80px rgba(0,0,0,0.15);
   animation: slideUp 0.22s ease;

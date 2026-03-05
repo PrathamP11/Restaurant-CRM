@@ -141,9 +141,15 @@ router.patch('/:id/status', async (req, res) => {
       { new: true }
     );
 
-    // If dine-in order is done, free the table
+    // If dine-in order is done, free the table after 10 min (eating time)
     if (status === 'done' && order.type === 'dine-in' && order.tableId) {
-      await Table.findByIdAndUpdate(order.tableId, { isReserved: false });
+      setTimeout(async () => {
+        try {
+          await Table.findByIdAndUpdate(order.tableId, { isReserved: false });
+        } catch (e) {
+          console.error('Failed to free table:', e.message);
+        }
+      }, 10 * 60 * 1000);
     }
 
     res.json(order);

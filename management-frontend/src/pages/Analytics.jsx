@@ -148,8 +148,8 @@ export default function Analytics({ filter }) {
 
   const [orderPeriod, setOrderPeriod] = useState("Daily");
   const [revPeriod,   setRevPeriod]   = useState("Weekly");
-  const [periodData,  setPeriodData]  = useState({ served: 1, dineIn: 1, takeaway: 1 });
-  const [revenueData, setRevenueData] = useState([10, 0, 0, 0, 0, 0, 0]); 
+  const [periodData,  setPeriodData]  = useState({ served: 0, dineIn: 0, takeaway: 0  });
+  const [revenueData, setRevenueData] = useState([0, 0, 0, 0, 0, 0, 0]); 
   const [revLabels,   setRevLabels]   = useState(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
   const [loadingRev,  setLoadingRev]  = useState(false);
 
@@ -186,7 +186,7 @@ export default function Analytics({ filter }) {
 
   return (
     <div className="analytics-page">
-      <h2 className="section-title">Analytics</h2>
+      <h2 className="analytics-title">Analytics</h2>
 
       {/* Stat Cards */}
       <div className="stat-row">

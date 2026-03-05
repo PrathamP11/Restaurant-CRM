@@ -34,9 +34,8 @@ const menuItems = [
   { name: 'Crispy Fries',description: 'Golden crispy fries',     price: 99,  averagePreparationTime: 10, category: 'French fries', stock: 70, order: 8, image: "/icons/crispy-fries.png" },
   { name: 'Waffle Fries',description: 'Belgian waffle fries',    price: 129, averagePreparationTime: 12, category: 'French fries', stock: 60, order: 9, image: "/icons/waffle-fries.png" },
   { name: 'Salad',       description: 'Fresh garden salad',      price: 89,  averagePreparationTime: 8,  category: 'Veggies',      stock: 40, order: 10, image: "/icons/salad.png" },
-  { name: 'Paneer Tikka',description: 'Indian salad',    price: 179, averagePreparationTime: 20, category: 'Veggies',      stock: 35, order: 11, image: "/icons/Indian-salad.png" },
+  { name: 'Indian Salad',description: 'Indian salad',            price: 92, averagePreparationTime: 20, category: 'Veggies',      stock: 35, order: 11, image: "/icons/Indian-salad.png" },
 ];
-
 async function seed() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
