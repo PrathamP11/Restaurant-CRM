@@ -64,6 +64,18 @@
   padding: 8px 10px;
 }
 
+.lm-input-error {
+  border-bottom-color: #e53935 !important;
+  border-color: #e53935 !important;
+}
+
+.lm-error {
+  display: block;
+  color: #e53935;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 .login-btn {
   display: block;
   margin: 20px auto 0;

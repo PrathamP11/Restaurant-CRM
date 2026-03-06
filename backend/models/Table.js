@@ -11,9 +11,9 @@ const tableSchema = new mongoose.Schema({
   },
   chairs: {
     type: Number,
-    min: 1,
+    min: 2,
     max: 8,
-    default: 3,
+    default: 2,
   },
   isReserved: {
     type: Boolean,

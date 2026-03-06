@@ -15,12 +15,16 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+  background: #FFF;
+  border-radius: 20px;
+  padding: 20px;
+  min-height: 100vh;
 }
 
 /* Menu card */
 .menu-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: #f0f5f3;
+  border: 2px solid #d9d9d9;
   border-radius: 14px;
   padding: 14px;
   cursor: grab;

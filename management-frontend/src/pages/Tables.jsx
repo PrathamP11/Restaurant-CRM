@@ -6,7 +6,8 @@ export default function Tables() {
   const { tables, addTable, deleteTable } = useApp();
   const [showPopup, setShowPopup] = useState(false);
   const [popupName, setPopupName] = useState("");
-  const [popupChairs, setPopupChairs] = useState("03");
+  const [popupChairs, setPopupChairs] = useState("02");
+  const [popupBelow, setPopupBelow] = useState(false);
   const popupRef = useRef(null);
 
   useEffect(() => {
@@ -20,10 +21,29 @@ export default function Tables() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showPopup]);
 
+  const defaultChairs = (tableNum) => {
+    if (tableNum <= 8) return "02";
+    if (tableNum <= 16) return "04";
+    if (tableNum <= 24) return "06";
+    return "08";
+  };
+
+  const handleTogglePopup = () => {
+    if (!showPopup) {
+      setPopupChairs(defaultChairs(tables.length + 1));
+      if (popupRef.current) {
+        const rect = popupRef.current.getBoundingClientRect();
+        const spaceRight = window.innerWidth - rect.right;
+        setPopupBelow(spaceRight < 200);
+      }
+    }
+    setShowPopup(v => !v);
+  };
+
   const handleAdd = () => {
     if (tables.length >= 30) return alert("Maximum 30 tables allowed.");
     addTable(popupName, parseInt(popupChairs));
-    setPopupName(""); setPopupChairs("03"); setShowPopup(false);
+    setPopupName(""); setPopupChairs("02"); setShowPopup(false);
   };
 
   const handleDelete = (id, reserved) => {
@@ -57,12 +77,12 @@ export default function Tables() {
         {/* Add button */}
         {tables.length < 30 && (
           <div className="add-table-wrap" ref={popupRef}>
-            <button className="add-table-btn" onClick={() => setShowPopup(v => !v)}>
+            <button className="add-table-btn" onClick={handleTogglePopup}>
               <span className="add-plus">+</span>
             </button>
 
             {showPopup && (
-              <div className="add-popup">
+              <div className={`add-popup ${popupBelow ? "add-popup-below" : ""}`}>
                 <p className="popup-label">Table name (optional)</p>
                 <input
                   className="popup-input"
@@ -73,7 +93,7 @@ export default function Tables() {
                 <p className="popup-label">Chair</p>
                 <div className="popup-select-wrap">
                   <select className="popup-select" value={popupChairs} onChange={e => setPopupChairs(e.target.value)}>
-                    {["01","02","03","04","05","06","07","08"].map(v => <option key={v} value={v}>{v}</option>)}
+                    {["02","04","06","08"].map(v => <option key={v} value={v}>{v}</option>)}
                   </select>
                 </div>
                 <button className="popup-create" onClick={handleAdd}>Create</button>

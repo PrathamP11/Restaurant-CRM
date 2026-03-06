@@ -59,11 +59,12 @@ function SwipeToOrder({ onSwipe, disabled }) {
 }
 
 export default function Checkout({ onOrder, onBack }) {
-  const { cartItems, cartTotal, user, removeItem, deleteItem, addItem, placeOrder, tables, fetchTables } = useCart();
+  const { cartItems, cartTotal, user, setUser, removeItem, deleteItem, addItem, placeOrder, tables, fetchTables } = useCart();
   const [orderType, setOrderType] = useState("dine-in");
   const [showCI, setShowCI] = useState(false);
   const [instructions, setInst] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const deliveryTime = 42;
 
@@ -74,23 +75,20 @@ export default function Checkout({ onOrder, onBack }) {
     if (submitting) return;
     setSubmitting(true);
     try {
-      // Re-fetch tables to get current reservation status
-      const freshTables = await fetchTables();
-      const available = freshTables.filter(t => !t.isReserved);
-      const freshTable = available[Math.floor(Math.random() * available.length)];
       await placeOrder({
         type: orderType,
-        tableId: orderType === "dine-in" ? freshTable?._id : null,
         customerName: user?.name || "Guest",
         phone: user?.contact || "",
         address: user?.address || "",
-        persons: user?.persons || "",
+        persons: user?.persons || 1,
         cookingInstructions: instructions,
       });
       onOrder();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to place order. Try again.");
+      const msg = err.response?.data?.message || "Failed to place order. Try again.";
+      setErrorMsg(msg);
       setSubmitting(false);
+      setTimeout(() => { setUser(null); onBack(); }, 5000);
     }
   };
 
@@ -177,6 +175,14 @@ export default function Checkout({ onOrder, onBack }) {
       </div>
 
       {showCI && <CookingModal onClose={() => setShowCI(false)} onSave={(t) => { setInst(t); }} />}
+
+      {errorMsg && (
+        <div className="checkout-error-toast">
+          <p>{errorMsg}</p>
+          <p className="error-redirect">Redirecting to update details…</p>
+          <div className="error-timer-bar" />
+        </div>
+      )}
     </div>
   );
 }

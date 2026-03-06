@@ -5,10 +5,29 @@ import "./Home.css";
 /* ─── Login Modal ─── */
 function LoginModal({ onSubmit }) {
   const [form, setForm] = useState({ name: "", persons: "", address: "", contact: "" });
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+  const [errors, setErrors] = useState({});
+  const set = (k, v) => {
+    setForm(p => ({ ...p, [k]: v }));
+    setErrors(p => ({ ...p, [k]: "" }));
+  };
+
+  const validate = () => {
+    const errs = {};
+    if (!form.name.trim()) errs.name = "Name is required.";
+    const persons = Number(form.persons);
+    if (!form.persons) errs.persons = "Number of persons is required.";
+    else if (!Number.isInteger(persons) || persons < 1 || persons > 8) errs.persons = "Must be between 1 and 8.";
+    if (!form.address.trim()) errs.address = "Address is required.";
+    else if (!/^[a-zA-Z0-9\s,.\-/#]+$/.test(form.address.trim())) errs.address = "Invalid address format.";
+    if (!form.contact) errs.contact = "Contact is required.";
+    else if (!/^\d{10}$/.test(form.contact)) errs.contact = "Must be exactly 10 digits.";
+    return errs;
+  };
 
   const handleSubmit = () => {
-    if (!form.name || !form.contact) return alert("Name and contact are required.");
+    const errs = validate();
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     onSubmit(form);
   };
 
@@ -18,19 +37,23 @@ function LoginModal({ onSubmit }) {
         <h3 className="login-title">Enter Your Details</h3>
         <div className="lm-field">
           <label>Name</label>
-          <input className="lm-input" placeholder="full name" value={form.name} onChange={e => set("name", e.target.value)} />
+          <input className={`lm-input${errors.name ? " lm-input-error" : ""}`} placeholder="full name" value={form.name} onChange={e => set("name", e.target.value)} />
+          {errors.name && <span className="lm-error">{errors.name}</span>}
         </div>
         <div className="lm-field">
           <label>Number of Person</label>
-          <input className="lm-input active" placeholder="1-8" type="number" value={form.persons} onChange={e => set("persons", e.target.value)} />
+          <input className={`lm-input active${errors.persons ? " lm-input-error" : ""}`} placeholder="1-8" type="number" min="1" max="8" value={form.persons} onChange={e => set("persons", e.target.value)} />
+          {errors.persons && <span className="lm-error">{errors.persons}</span>}
         </div>
         <div className="lm-field">
           <label>Address</label>
-          <input className="lm-input" placeholder="address" value={form.address} onChange={e => set("address", e.target.value)} />
+          <input className={`lm-input${errors.address ? " lm-input-error" : ""}`} placeholder="address" value={form.address} onChange={e => set("address", e.target.value)} />
+          {errors.address && <span className="lm-error">{errors.address}</span>}
         </div>
         <div className="lm-field">
           <label>Contact</label>
-          <input className="lm-input" placeholder="phone" value={form.contact} onChange={e => set("contact", e.target.value)} />
+          <input className={`lm-input${errors.contact ? " lm-input-error" : ""}`} placeholder="10-digit phone number" value={form.contact} onChange={e => set("contact", e.target.value.replace(/\D/g, "").slice(0, 10))} />
+          {errors.contact && <span className="lm-error">{errors.contact}</span>}
         </div>
         <button className="btn-round login-btn" onClick={handleSubmit}>
           Order Now

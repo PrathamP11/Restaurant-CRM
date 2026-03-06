@@ -57,7 +57,7 @@ export function CartProvider({ children }) {
   const cartCount = cartItems.reduce((s, { qty }) => s + qty, 0);
 
   // Place order — called from Checkout on swipe
-  const placeOrder = async ({ type, tableId, customerName, phone, address, persons, cookingInstructions }) => {
+  const placeOrder = async ({ type, customerName, phone, address, persons, cookingInstructions }) => {
     const items = cartItems.map(({ item, qty }) => ({
       menuItemId:             item._id,
       name:                   item.name,
@@ -67,8 +67,7 @@ export function CartProvider({ children }) {
     }));
 
     const res = await axios.post(`${API}/orders`, {
-      type, tableId: tableId || null,
-      items, customerName, phone, address,
+      type, items, customerName, phone, address,
       persons: persons || 1,
       cookingInstructions: cookingInstructions || "",
     });

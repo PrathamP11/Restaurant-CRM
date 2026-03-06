@@ -10,13 +10,25 @@ async function assignChef() {
   if (!chefs.length) return null;
   const minOrders = Math.min(...chefs.map(c => c.orders));
   const candidates = chefs.filter(c => c.orders === minOrders);
-  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-  return chosen;
+  return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
 // GET all orders (newest first)
 router.get('/', async (req, res) => {
   try {
+    const isReload = req.query.reload === 'true';
+
+    if (isReload) {
+      const processing = await Order.find({ status: 'processing' });
+      for (const order of processing) {
+        const nextStatus = order.type === 'takeaway' ? 'not_picked' : 'done';
+        await Order.findByIdAndUpdate(order._id, { status: nextStatus });
+        if (order.tableId) {
+          await Table.findByIdAndUpdate(order.tableId, { isReserved: false });
+        }
+      }
+    }
+
     const orders = await Order.find()
       .populate('chefId', 'name')
       .sort({ createdAt: -1 });
@@ -29,25 +41,24 @@ router.get('/', async (req, res) => {
 // GET analytics summary
 router.get('/analytics', async (req, res) => {
   try {
-    const { period } = req.query;  // daily | weekly | monthly
+    const { period } = req.query;
     const now = new Date();
     let since = new Date(0);
 
-    if (period === 'daily') since = new Date(now - 86400000);
-    if (period === 'weekly') since = new Date(now - 7 * 86400000);
+    if (period === 'daily')   since = new Date(now - 86400000);
+    if (period === 'weekly')  since = new Date(now - 7 * 86400000);
     if (period === 'monthly') since = new Date(now - 30 * 86400000);
 
     const orders = await Order.find({ createdAt: { $gte: since } });
 
-    const served = orders.filter(o => o.status === 'done').length;
-    const dineIn = orders.filter(o => o.type === 'dine-in').length;
+    const served   = orders.filter(o => o.status === 'done').length;
+    const dineIn   = orders.filter(o => o.type === 'dine-in').length;
     const takeaway = orders.filter(o => o.type === 'takeaway').length;
-    const revenue = orders.reduce((s, o) => s + o.revenue, 0);
+    const revenue  = orders.reduce((s, o) => s + o.revenue, 0);
 
-    // Unique clients by phone
-    const allOrders = await Order.find();
+    const allOrders    = await Order.find();
     const totalClients = new Set(allOrders.map(o => o.phone)).size;
-    const totalOrders = allOrders.length;
+    const totalOrders  = allOrders.length;
     const totalRevenue = allOrders.reduce((s, o) => s + o.revenue, 0);
 
     res.json({ served, dineIn, takeaway, revenue, totalClients, totalOrders, totalRevenue });
@@ -63,21 +74,66 @@ router.get('/revenue', async (req, res) => {
     const now = new Date();
     const data = [];
 
-    let days = 7;
-    if (period === 'daily') days = 1;
-    if (period === 'monthly') days = 30;
-    if (period === 'yearly') days = 365;
+    if (period === 'daily') {
+      // 24 hourly buckets for today
+      const todayStart = new Date(now);
+      todayStart.setHours(0, 0, 0, 0);
 
-    for (let i = days - 1; i >= 0; i--) {
-      const start = new Date(now);
-      start.setDate(start.getDate() - i);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(start);
-      end.setHours(23, 59, 59, 999);
+      for (let h = 0; h < 24; h++) {
+        const start = new Date(todayStart);
+        start.setHours(h, 0, 0, 0);
+        const end = new Date(todayStart);
+        end.setHours(h, 59, 59, 999);
 
-      const orders = await Order.find({ createdAt: { $gte: start, $lte: end } });
-      const revenue = orders.reduce((s, o) => s + o.revenue, 0);
-      data.push({ date: start.toISOString().split('T')[0], revenue });
+        const orders  = await Order.find({ createdAt: { $gte: start, $lte: end } });
+        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
+        // label: "1am", "2pm" etc
+        const label = h === 0 ? '12am' : h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h - 12}pm`;
+        data.push({ date: label, revenue });
+      }
+
+    } else if (period === 'weekly') {
+      // 7 days
+      for (let i = 6; i >= 0; i--) {
+        const start = new Date(now);
+        start.setDate(start.getDate() - i);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(start);
+        end.setHours(23, 59, 59, 999);
+
+        const orders  = await Order.find({ createdAt: { $gte: start, $lte: end } });
+        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
+        data.push({ date: start.toISOString().split('T')[0], revenue });
+      }
+
+    } else if (period === 'monthly') {
+      // days in current month
+      const year  = now.getFullYear();
+      const month = now.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const start = new Date(year, month, d, 0, 0, 0, 0);
+        const end   = new Date(year, month, d, 23, 59, 59, 999);
+
+        const orders  = await Order.find({ createdAt: { $gte: start, $lte: end } });
+        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
+        data.push({ date: String(d), revenue });
+      }
+
+    } else if (period === 'yearly') {
+      // 12 months of current year
+      const year = now.getFullYear();
+      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+      for (let m = 0; m < 12; m++) {
+        const start = new Date(year, m, 1, 0, 0, 0, 0);
+        const end   = new Date(year, m + 1, 0, 23, 59, 59, 999);
+
+        const orders  = await Order.find({ createdAt: { $gte: start, $lte: end } });
+        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
+        data.push({ date: monthNames[m], revenue });
+      }
     }
 
     res.json(data);
@@ -86,43 +142,40 @@ router.get('/revenue', async (req, res) => {
   }
 });
 
-// POST create order (from user frontend)
+// POST create order
 router.post('/', async (req, res) => {
   try {
     const { type, tableId, items, customerName, phone, address, persons, cookingInstructions } = req.body;
 
-    // Assign chef
     const chef = await assignChef();
     if (!chef) return res.status(400).json({ message: 'No chefs available.' });
 
-    // Calculate revenue + processing time
-    const revenue = items.reduce((s, i) => s + i.price * i.qty, 0);
-    const maxPrepTime = Math.max(...items.map(i => i.averagePreparationTime || 15));
-    const processingTime = maxPrepTime * 60; // convert to seconds
+    const revenue        = items.reduce((s, i) => s + i.price * i.qty, 0);
+    const totalPrepTime  = Math.min(items.reduce((s, i) => s + (i.averagePreparationTime || 5) * i.qty, 0), 15);
+    const processingTime = totalPrepTime * 60;
+    const itemCount      = items.reduce((s, i) => s + i.qty, 0);
 
-    // Calculate itemCount
-    const itemCount = items.reduce((s, i) => s + i.qty, 0);
+    let tableNumber    = null;
+    let assignedTableId = null;
 
-    let tableNumber = null;
+    if (type === 'dine-in') {
+      const partySize  = parseInt(persons) || 1;
+      const bestTable  = await Table.findOne({ isReserved: false, chairs: { $gte: partySize } }).sort({ chairs: 1, tableNumber: 1 });
+      if (!bestTable) return res.status(400).json({ message: 'No suitable table available for your party size.' });
 
-    // If dine-in, reserve the table
-    if (type === 'dine-in' && tableId) {
-      const table = await Table.findByIdAndUpdate(
-        tableId,
-        { isReserved: true },
-        { new: true }
-      );
-      tableNumber = table ? table.tableNumber : null;
+      bestTable.isReserved = true;
+      await bestTable.save();
+      assignedTableId = bestTable._id;
+      tableNumber     = bestTable.tableNumber;
     }
 
     const order = await Order.create({
-      type, tableId: type === 'dine-in' ? tableId : null, tableNumber,
+      type, tableId: assignedTableId, tableNumber,
       items, itemCount, customerName, phone, address,
       persons: persons || 1, cookingInstructions: cookingInstructions || '',
       revenue, chefId: chef._id, processingTime, status: 'processing',
     });
 
-    // Increment chef order count
     await Chef.findByIdAndUpdate(chef._id, { $inc: { orders: 1 } });
 
     res.status(201).json(order);
@@ -131,30 +184,19 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PATCH update order status (restaurant marks done/not_picked)
+// PATCH update order status
 router.patch('/:id/status', async (req, res) => {
   try {
-    const { status } = req.body;  // 'done' | 'not_picked'
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    const { status } = req.body;
+    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
 
-    // If dine-in order is done, free the table after 10 min (eating time)
-    if (status === 'done' && order.type === 'dine-in' && order.tableId) {
-      setTimeout(async () => {
-        try {
-          await Table.findByIdAndUpdate(order.tableId, { isReserved: false });
-        } catch (e) {
-          console.error('Failed to free table:', e.message);
-        }
-      }, 10 * 60 * 1000);
+    if ((status === 'done' || status === 'not_picked') && order.tableId) {
+      await Table.findByIdAndUpdate(order.tableId, { isReserved: false });
     }
 
     res.json(order);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 

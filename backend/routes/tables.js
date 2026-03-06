@@ -55,9 +55,17 @@ router.delete('/:id', async (req, res) => {
     await Table.findByIdAndDelete(req.params.id);
 
     // Renumber remaining tables sequentially (1, 2, 3...)
+    // and update tableNumber on any active orders referencing them
     const remaining = await Table.find().sort({ tableNumber: 1 });
     for (let i = 0; i < remaining.length; i++) {
-      await Table.findByIdAndUpdate(remaining[i]._id, { tableNumber: i + 1 });
+      const newNum = i + 1;
+      if (remaining[i].tableNumber !== newNum) {
+        await Table.findByIdAndUpdate(remaining[i]._id, { tableNumber: newNum });
+        await Order.updateMany(
+          { tableId: remaining[i]._id, status: 'processing' },
+          { tableNumber: newNum }
+        );
+      }
     }
 
     const updated = await Table.find().sort({ tableNumber: 1 });

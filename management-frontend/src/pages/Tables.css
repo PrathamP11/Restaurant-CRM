@@ -55,6 +55,10 @@
   object-fit: contain;
 }
 
+.table-card.reserved:hover {
+  border-color: var(--green);
+}
+
 .table-card.reserved .table-delete {
   cursor: not-allowed;
 }
