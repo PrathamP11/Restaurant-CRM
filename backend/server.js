@@ -4,7 +4,6 @@ const cors       = require('cors');
 const dotenv     = require('dotenv');
 const path       = require('path');
 const fs         = require('fs');
-const seed       = require('./seed.js');
 
 dotenv.config();
 
@@ -32,15 +31,6 @@ app.get('/', (req, res) => {
   res.json({ message: 'Restaurant API is running' });
 });
 
-// ── Seed route ──────────────────────────────────────────
-app.get("/seed", async (req, res) => {
-  try {
-    await seed();
-    res.send("Database seeded successfully");
-  } catch (err) { 
-    res.status(500).send(err.message);
-  }
-});
 
 // ── MongoDB Connection ───────────────────────────────────
 mongoose
