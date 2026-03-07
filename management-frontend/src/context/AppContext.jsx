@@ -3,7 +3,7 @@ import axios from "axios";
 
 const AppContext = createContext();
 
-const API = "http://localhost:5000/api";
+const API = "https://restaurant-crm-fhav.onrender.com/api";
 
 export function AppProvider({ children }) {
   const [menuItems, setMenuItems] = useState([]);
