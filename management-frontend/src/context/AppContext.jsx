@@ -6,12 +6,12 @@ const AppContext = createContext();
 const API = "http://localhost:5000/api";
 
 export function AppProvider({ children }) {
-  const [menuItems,  setMenuItems]  = useState([]);
-  const [orders,     setOrders]     = useState([]);
-  const [chefs,      setChefs]      = useState([]);
-  const [tables,     setTables]     = useState([]);
-  const [analytics,  setAnalytics]  = useState({ totalRevenue: 0, totalOrders: 0, totalClients: 0 });
-  const [loading,    setLoading]    = useState(true);
+  const [menuItems, setMenuItems] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [chefs, setChefs] = useState([]);
+  const [tables, setTables] = useState([]);
+  const [analytics, setAnalytics] = useState({ totalRevenue: 0, totalOrders: 0, totalClients: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAll();
@@ -27,14 +27,14 @@ export function AppProvider({ children }) {
     return () => clearInterval(t);
   }, []);
 
-  // ── Called once on mount (tab reload) — completes expired orders first ──
+  // ── Called once on mount —
   const fetchAll = async () => {
     setLoading(true);
     try {
-      await fetchOrdersOnReload();   // completes expired orders in DB first
       await Promise.all([
+        fetchOrders(),
         fetchChefs(),
-        fetchTables(),               // now gets correct reserved status
+        fetchTables(),
         fetchMenu(),
         fetchAnalytics("daily"),
       ]);
@@ -120,11 +120,6 @@ export function AppProvider({ children }) {
     setOrders(res.data);
   };
 
-  // Reload fetch — called only on page mount, completes all expired orders
-  const fetchOrdersOnReload = async () => {
-    const res = await axios.get(`${API}/orders?reload=true`);
-    setOrders(res.data);
-  };
 
   const updateOrderStatus = async (id, status) => {
     try {
@@ -157,9 +152,9 @@ export function AppProvider({ children }) {
       addTable, deleteTable,
       updateOrderStatus,
       fetchAnalytics, fetchRevenue, fetchOrders,
-      totalRevenue:  analytics.totalRevenue,
-      totalOrders:   analytics.totalOrders,
-      totalClients:  analytics.totalClients,
+      totalRevenue: analytics.totalRevenue,
+      totalOrders: analytics.totalOrders,
+      totalClients: analytics.totalClients,
     }}>
       {children}
     </AppContext.Provider>

@@ -3,12 +3,18 @@ const mongoose   = require('mongoose');
 const cors       = require('cors');
 const dotenv     = require('dotenv');
 const path       = require('path');
+const fs         = require('fs');
 
 dotenv.config();
 
 const app = express();
-
 app.use(express.static(path.join(__dirname, 'public')));
+
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 
 // ── Middleware ──────────────────────────────────────────
 app.use(cors());

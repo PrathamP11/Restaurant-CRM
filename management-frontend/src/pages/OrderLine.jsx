@@ -18,37 +18,14 @@ function calcRemaining(order) {
 }
 
 function useCountdown(order, onStatusChange) {
-  const nextStatus = order.type === "takeaway" ? "not_picked" : "done";
-  const nextStatusRef = useRef(nextStatus);
-  nextStatusRef.current = nextStatus;
-
-  const [remaining, setRemaining] = useState(() => calcRemaining(order));
-
-  // Recalculate remaining when order data changes (e.g. after page refresh)
-  useEffect(() => {
-    setRemaining(calcRemaining(order));
-  }, [order.status, order._id, order.createdAt]);
+  const remaining = calcRemaining(order);
 
   useEffect(() => {
-    if (order.status !== "processing" || remaining <= 0) {
-      if (order.status === "processing" && remaining <= 0) {
-        onStatusChange(order._id, nextStatusRef.current);
-      }
-      return;
+    if (order.status === "processing" && remaining <= 0) {
+      const nextStatus = order.type === "takeaway" ? "not_picked" : "done";
+      onStatusChange(order._id, nextStatus);
     }
-    const t = setInterval(() => {
-      setRemaining(prev => {
-        const next = prev - 1;
-        if (next <= 0) {
-          clearInterval(t);
-          onStatusChange(order._id, nextStatusRef.current);
-          return 0;
-        }
-        return next;
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, [order.status, order._id, remaining]);
+  }, [remaining, order.status]);
 
   return remaining;
 }
@@ -83,7 +60,7 @@ function OrderCard({ order, onStatusChange }) {
             <img src="/icons/fork.png" alt="order" className="ico" style={{ opacity: 0.6 }} />
             <div>
               <p className="oc-id"># {order.orderId?.replace("ORD-", "") || order._id?.slice(-4)}</p>
-              <p className="oc-meta">{order.type === "dine-in" ? `Table-${String(order.tableNumber).padStart(2, "0")}` : "Takeaway"}</p>
+              <p className="oc-meta">{order.type === "dine-in" && order.tableId ? `Table-${String(order.tableId.tableNumber).padStart(2, "0")}` : order.type === "dine-in" ? "Table (deleted)" : "Takeaway"}</p>
               <p className="oc-meta">{formatOrderTime(order.createdAt)}</p>
             </div>
           </div>
@@ -128,13 +105,6 @@ function OrderCard({ order, onStatusChange }) {
 
 export default function OrderLine() {
   const { orders, updateOrderStatus, fetchOrders } = useApp();
-
-  // Poll every 5 seconds for new orders — normal fetch, no reload flag
-  useEffect(() => {
-    const t = setInterval(fetchOrders, 5000);
-    return () => clearInterval(t);
-  }, []);
-
   return (
     <>
       <h2 className="orderline-title">Order Line</h2>

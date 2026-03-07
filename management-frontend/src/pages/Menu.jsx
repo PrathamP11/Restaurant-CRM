@@ -9,7 +9,7 @@ function AddItemPage({ onBack }) {
   const { addMenuItem } = useApp();
   const [form, setForm] = useState({
     name: "", description: "", price: "", averagePreparationTime: "",
-    category: "Burgers", stock: "",
+    category: "Burger", stock: "",
   });
   const [previewImg, setPreviewImg] = useState(null);
   const fileRef = useRef();
@@ -159,7 +159,9 @@ export default function Menu({ filter }) {
   const onDragOver = (i) => setDragOver(i);
   const onDrop = (i) => {
     if (dragFrom.current === null || dragFrom.current === i) return;
-    reorderMenu(dragFrom.current, i);
+    const globalFrom = menuItems.indexOf(filtered[dragFrom.current]);
+    const globalTo = menuItems.indexOf(filtered[i]);
+    reorderMenu(globalFrom, globalTo);
     dragFrom.current = null;
     setDragOver(null);
   };

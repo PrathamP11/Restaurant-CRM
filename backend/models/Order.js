@@ -25,10 +25,6 @@ const orderSchema = new mongoose.Schema({
     ref: 'Table',
     default: null,
   },
-  tableNumber: {
-    type: Number,
-    default: null,
-  },
   items: [orderItemSchema],
   itemCount: {
     type: Number,
@@ -56,6 +52,10 @@ const orderSchema = new mongoose.Schema({
   processingTime: {
     type: Number,
     default: 0,
+  },
+  processingEndTime: {
+    type: Date,
+    default: null
   },
   status: {
     type: String,

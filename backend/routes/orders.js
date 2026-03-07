@@ -16,21 +16,9 @@ async function assignChef() {
 // GET all orders (newest first)
 router.get('/', async (req, res) => {
   try {
-    const isReload = req.query.reload === 'true';
-
-    if (isReload) {
-      const processing = await Order.find({ status: 'processing' });
-      for (const order of processing) {
-        const nextStatus = order.type === 'takeaway' ? 'not_picked' : 'done';
-        await Order.findByIdAndUpdate(order._id, { status: nextStatus });
-        if (order.tableId) {
-          await Table.findByIdAndUpdate(order.tableId, { isReserved: false });
-        }
-      }
-    }
-
     const orders = await Order.find()
       .populate('chefId', 'name')
+      .populate('tableId', 'tableNumber')
       .sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
@@ -168,27 +156,46 @@ router.post('/', async (req, res) => {
     const revenue = itemTotal + deliveryCharge + taxes;
     const totalPrepTime = Math.min(items.reduce((s, i) => s + (i.averagePreparationTime || 5) * i.qty, 0), 15);
     const processingTime = totalPrepTime * 60;
+    const processingEndTime = new Date(Date.now() + processingTime * 1000);
     const itemCount = items.reduce((s, i) => s + i.qty, 0);
 
-    let tableNumber = null;
     let assignedTableId = null;
 
     if (type === 'dine-in') {
       const partySize = parseInt(persons) || 1;
-      const bestTable = await Table.findOne({ isReserved: false, chairs: { $gte: partySize } }).sort({ chairs: 1, tableNumber: 1 });
-      if (!bestTable) return res.status(400).json({ message: 'No suitable table available for your party size.' });
+      const bestTable = await Table.findOneAndUpdate(
+        { isReserved: false, chairs: { $gte: partySize } },
+        { isReserved: true },
+        {
+          sort: { chairs: 1, tableNumber: 1 },
+          returnDocument: 'after'
+        }
+      );
 
-      bestTable.isReserved = true;
-      await bestTable.save();
+      if (!bestTable) {
+        return res.status(400).json({
+          message: 'No suitable table available for your party size.'
+        });
+      }
+
       assignedTableId = bestTable._id;
-      tableNumber = bestTable.tableNumber;
     }
 
     const order = await Order.create({
-      type, tableId: assignedTableId, tableNumber,
-      items, itemCount, customerName, phone, address,
-      persons: persons || 1, cookingInstructions: cookingInstructions || '',
-      revenue, chefId: chef._id, processingTime, status: 'processing',
+      type,
+      tableId: assignedTableId,
+      items,
+      itemCount,
+      customerName,
+      phone,
+      address,
+      persons: persons || 1,
+      cookingInstructions: cookingInstructions || '',
+      revenue,
+      chefId: chef._id,
+      processingTime,
+      processingEndTime,
+      status: 'processing',
     });
 
     await Chef.findByIdAndUpdate(chef._id, { $inc: { orders: 1 } });
