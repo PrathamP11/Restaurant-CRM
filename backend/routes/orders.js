@@ -45,20 +45,20 @@ router.get('/analytics', async (req, res) => {
     const now = new Date();
     let since = new Date(0);
 
-    if (period === 'daily')   since = new Date(now - 86400000);
-    if (period === 'weekly')  since = new Date(now - 7 * 86400000);
-    if (period === 'monthly') since = new Date(now - 30 * 86400000);
+    if (period === 'daily') since = new Date(now - 7 * 86400000);
+    if (period === 'weekly') since = new Date(now.getFullYear(), now.getMonth(), 1);
+    if (period === 'monthly') since = new Date(now.getFullYear(), 0, 1);
 
     const orders = await Order.find({ createdAt: { $gte: since } });
 
-    const served   = orders.filter(o => o.status === 'done').length;
-    const dineIn   = orders.filter(o => o.type === 'dine-in').length;
+    const served = orders.filter(o => o.status === 'done' && o.type === 'dine-in').length;
+    const dineIn = orders.filter(o => o.type === 'dine-in').length;
     const takeaway = orders.filter(o => o.type === 'takeaway').length;
-    const revenue  = orders.reduce((s, o) => s + o.revenue, 0);
+    const revenue = orders.reduce((s, o) => s + o.revenue, 0);
 
-    const allOrders    = await Order.find();
+    const allOrders = await Order.find();
     const totalClients = new Set(allOrders.map(o => o.phone)).size;
-    const totalOrders  = allOrders.length;
+    const totalOrders = allOrders.length;
     const totalRevenue = allOrders.reduce((s, o) => s + o.revenue, 0);
 
     res.json({ served, dineIn, takeaway, revenue, totalClients, totalOrders, totalRevenue });
@@ -74,26 +74,11 @@ router.get('/revenue', async (req, res) => {
     const now = new Date();
     const data = [];
 
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     if (period === 'daily') {
-      // 24 hourly buckets for today
-      const todayStart = new Date(now);
-      todayStart.setHours(0, 0, 0, 0);
-
-      for (let h = 0; h < 24; h++) {
-        const start = new Date(todayStart);
-        start.setHours(h, 0, 0, 0);
-        const end = new Date(todayStart);
-        end.setHours(h, 59, 59, 999);
-
-        const orders  = await Order.find({ createdAt: { $gte: start, $lte: end } });
-        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
-        // label: "1am", "2pm" etc
-        const label = h === 0 ? '12am' : h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h - 12}pm`;
-        data.push({ date: label, revenue });
-      }
-
-    } else if (period === 'weekly') {
-      // 7 days
+      // Last 7 days, one entry per day, labeled by day name
       for (let i = 6; i >= 0; i--) {
         const start = new Date(now);
         start.setDate(start.getDate() - i);
@@ -101,38 +86,65 @@ router.get('/revenue', async (req, res) => {
         const end = new Date(start);
         end.setHours(23, 59, 59, 999);
 
-        const orders  = await Order.find({ createdAt: { $gte: start, $lte: end } });
+        const orders = await Order.find({ createdAt: { $gte: start, $lte: end } });
         const revenue = orders.reduce((s, o) => s + o.revenue, 0);
-        data.push({ date: start.toISOString().split('T')[0], revenue });
+        data.push({ date: dayNames[start.getDay()], revenue });
+      }
+
+    } else if (period === 'weekly') {
+      // Weeks in the current month, each starting on Monday
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      let weekStart = new Date(firstDay);
+      let week = 1;
+
+      while (weekStart <= lastDay) {
+        let weekEnd = new Date(weekStart);
+        // Find Sunday (end of week) or end of month
+        const daysUntilSunday = (7 - weekStart.getDay()) % 7;
+        weekEnd.setDate(weekEnd.getDate() + daysUntilSunday);
+        if (weekEnd > lastDay) weekEnd = new Date(lastDay);
+        weekEnd.setHours(23, 59, 59, 999);
+
+        const start = new Date(weekStart);
+        start.setHours(0, 0, 0, 0);
+
+        const orders = await Order.find({ createdAt: { $gte: start, $lte: weekEnd } });
+        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
+        data.push({ date: `W${week}`, revenue });
+
+        weekStart = new Date(weekEnd);
+        weekStart.setDate(weekStart.getDate() + 1);
+        weekStart.setHours(0, 0, 0, 0);
+        week++;
       }
 
     } else if (period === 'monthly') {
-      // days in current month
-      const year  = now.getFullYear();
-      const month = now.getMonth();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        const start = new Date(year, month, d, 0, 0, 0, 0);
-        const end   = new Date(year, month, d, 23, 59, 59, 999);
-
-        const orders  = await Order.find({ createdAt: { $gte: start, $lte: end } });
-        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
-        data.push({ date: String(d), revenue });
-      }
-
-    } else if (period === 'yearly') {
-      // 12 months of current year
+      // 12 months of the current year
       const year = now.getFullYear();
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
       for (let m = 0; m < 12; m++) {
         const start = new Date(year, m, 1, 0, 0, 0, 0);
-        const end   = new Date(year, m + 1, 0, 23, 59, 59, 999);
+        const end = new Date(year, m + 1, 0, 23, 59, 59, 999);
 
-        const orders  = await Order.find({ createdAt: { $gte: start, $lte: end } });
+        const orders = await Order.find({ createdAt: { $gte: start, $lte: end } });
         const revenue = orders.reduce((s, o) => s + o.revenue, 0);
         data.push({ date: monthNames[m], revenue });
+      }
+
+    } else if (period === 'yearly') {
+      // Last 10 years
+      const currentYear = now.getFullYear();
+
+      for (let y = currentYear - 9; y <= currentYear; y++) {
+        const start = new Date(y, 0, 1, 0, 0, 0, 0);
+        const end = new Date(y, 11, 31, 23, 59, 59, 999);
+
+        const orders = await Order.find({ createdAt: { $gte: start, $lte: end } });
+        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
+        data.push({ date: String(y), revenue });
       }
     }
 
@@ -145,28 +157,31 @@ router.get('/revenue', async (req, res) => {
 // POST create order
 router.post('/', async (req, res) => {
   try {
-    const { type, tableId, items, customerName, phone, address, persons, cookingInstructions } = req.body;
+    const { type, items, customerName, phone, address, persons, cookingInstructions } = req.body;
 
     const chef = await assignChef();
     if (!chef) return res.status(400).json({ message: 'No chefs available.' });
 
-    const revenue        = items.reduce((s, i) => s + i.price * i.qty, 0);
-    const totalPrepTime  = Math.min(items.reduce((s, i) => s + (i.averagePreparationTime || 5) * i.qty, 0), 15);
+    const itemTotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+    const deliveryCharge = type === 'takeaway' ? 50 : 0;
+    const taxes = Math.round(itemTotal * 0.025);
+    const revenue = itemTotal + deliveryCharge + taxes;
+    const totalPrepTime = Math.min(items.reduce((s, i) => s + (i.averagePreparationTime || 5) * i.qty, 0), 15);
     const processingTime = totalPrepTime * 60;
-    const itemCount      = items.reduce((s, i) => s + i.qty, 0);
+    const itemCount = items.reduce((s, i) => s + i.qty, 0);
 
-    let tableNumber    = null;
+    let tableNumber = null;
     let assignedTableId = null;
 
     if (type === 'dine-in') {
-      const partySize  = parseInt(persons) || 1;
-      const bestTable  = await Table.findOne({ isReserved: false, chairs: { $gte: partySize } }).sort({ chairs: 1, tableNumber: 1 });
+      const partySize = parseInt(persons) || 1;
+      const bestTable = await Table.findOne({ isReserved: false, chairs: { $gte: partySize } }).sort({ chairs: 1, tableNumber: 1 });
       if (!bestTable) return res.status(400).json({ message: 'No suitable table available for your party size.' });
 
       bestTable.isReserved = true;
       await bestTable.save();
       assignedTableId = bestTable._id;
-      tableNumber     = bestTable.tableNumber;
+      tableNumber = bestTable.tableNumber;
     }
 
     const order = await Order.create({
@@ -188,7 +203,7 @@ router.post('/', async (req, res) => {
 router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' });
 
     if ((status === 'done' || status === 'not_picked') && order.tableId) {
       await Table.findByIdAndUpdate(order.tableId, { isReserved: false });

@@ -10,7 +10,7 @@ function CookingModal({ onClose, onSave }) {
       <div className="bottom-sheet" onClick={e => e.stopPropagation()}>
         <h3 className="ci-title">Add Cooking instructions</h3>
         <div className="ci-textarea-wrap">
-        <textarea className="ci-textarea" rows={5} value={text} onChange={e => setText(e.target.value)} />
+          <textarea className="ci-textarea" rows={5} value={text} onChange={e => setText(e.target.value)} />
         </div>
         <p className="ci-note">
           The restaurant will try its best to follow your request. However, refunds or cancellations in this regard won't be possible
@@ -49,7 +49,7 @@ function SwipeToOrder({ onSwipe, disabled }) {
     >
       <div className="swipe-thumb" style={{ transform: `translateX(${offset}px)` }}
         onMouseDown={e => onStart(e.clientX)} onTouchStart={e => onStart(e.touches[0].clientX)}>
-        <span className="swipe-arrow">{disabled ? "..." : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>}</span>
+        <span className="swipe-arrow">{disabled ? "..." : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>}</span>
       </div>
       <span className="swipe-label" style={{ opacity: done ? 0 : 1 - offset / THRESHOLD * 0.8 }}>
         {disabled ? "Placing order..." : "Swipe to Order"}
@@ -66,7 +66,7 @@ export default function Checkout({ onOrder, onBack }) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const deliveryTime = 42;
+  const deliveryTime = 40;
 
   // Refresh tables every time checkout opens
   useEffect(() => { fetchTables(); }, []);
@@ -88,14 +88,22 @@ export default function Checkout({ onOrder, onBack }) {
       const msg = err.response?.data?.message || "Failed to place order. Try again.";
       setErrorMsg(msg);
       setSubmitting(false);
-      setTimeout(() => { setUser(null); onBack(); }, 5000);
+      setTimeout(() => { setUser(null); onBack(); }, 3000);
     }
+  };
+
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 18) return "Good afternoon";
+    if (h < 24) return "Good evening";
+    return "Good night";
   };
 
   return (
     <div className="screen checkout-screen">
       <div className="page-header">
-        <p className="greeting-big">Good evening</p>
+        <p className="greeting-big">{getGreeting()}</p>
         <p className="greeting-sub">Place you order here</p>
       </div>
 
@@ -118,11 +126,11 @@ export default function Checkout({ onOrder, onBack }) {
               <p className="ci-price">₹ {item.price}</p>
             </div>
             <div className="ci-qty-side">
-              <button className="rm-btn" onClick={() => deleteItem(item._id)}><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></button>
+              <button className="rm-btn" onClick={() => deleteItem(item._id)}><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>
               <div className="ci-qty-row">
-                <button className="qty-btn-co" disabled={qty <= 1} style={qty <= 1 ? { opacity: 0.4 } : {}} onClick={() => qty > 1 && removeItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></button>
+                <button className="qty-btn-co" disabled={qty <= 1} style={qty <= 1 ? { opacity: 0.4 } : {}} onClick={() => qty > 1 && removeItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>
                 <span className="qty-num-co">{qty}</span>
-                <button className="qty-btn-co" onClick={() => addItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></button>
+                <button className="qty-btn-co" onClick={() => addItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>
               </div>
             </div>
           </div>

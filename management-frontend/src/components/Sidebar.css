@@ -1,7 +1,7 @@
 .sidebar {
   position: fixed;
   top: 0;
-  left:15px;
+  left: 15px;
   width: 65px;
   height: 96vh;
   display: flex;
@@ -12,7 +12,7 @@
 
 .sidebar-logo {
   padding: 10px 0;
-  
+
 }
 
 .logo-icon {
@@ -20,7 +20,7 @@
   height: 54px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #FFFFFF;
+  background-color: #fff;
   padding: 8px;
 }
 
@@ -31,7 +31,7 @@
   align-items: center;
   gap: 15px;
   padding: 7px 6px 3px;
-  background: #FFFFFF;
+  background: #fff;
   border-radius: 50px;
 }
 

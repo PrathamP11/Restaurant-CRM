@@ -18,11 +18,16 @@ export function CartProvider({ children }) {
   useEffect(() => {
     fetchMenu();
     fetchTables();
+    const interval = setInterval(fetchMenu, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchMenu = async () => {
     try {
-      const res = await axios.get(`${API}/menu`);
+      const res = await axios.get(`${API}/menu`, {
+        headers: { "Cache-Control": "no-cache" },
+        params: { _t: Date.now() },
+      });
       setMenu(res.data);
     } catch (err) {
       console.error("Failed to fetch menu:", err.message);

@@ -2,13 +2,13 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: #FFF;
+  background-color: #fff;
   padding: 15px;
   border-radius: 20px;
   margin-top: 25px;
 }
 
-.orderline-title { 
+.orderline-title {
   font-size: 26px;
   font-weight: 600;
   color: #565656;
@@ -41,9 +41,6 @@
   background: #b9f8c9;
 }
 
-.card-pickup {
-  background: #b9f8c9;
-}
 
 .card-takeaway {
   background: #c2d4d9;
@@ -104,11 +101,6 @@
 .badge-done-green {
   background: #b9f8c9;
   color: #1B5E20;
-}
-
-.badge-pickup {
-  background: #b9f8c9;
-  color: #37474F;
 }
 
 .badge-takeaway {

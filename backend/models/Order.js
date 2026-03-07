@@ -67,9 +67,10 @@ const orderSchema = new mongoose.Schema({
 // Auto-generate orderId before saving
 orderSchema.pre('save', async function () {
   if (!this.orderId) {
-    const count = await mongoose.model('Order').countDocuments();
-    this.orderId = `ORD-${1000 + count + 1}`;
-  } 
+    const last = await mongoose.model('Order').findOne().sort({ createdAt: -1 }).select('orderId');
+    const lastNum = last?.orderId ? parseInt(last.orderId.replace('ORD-', ''), 10) : 1000;
+    this.orderId = `ORD-${lastNum + 1}`;
+  }
 });
 
 module.exports = mongoose.model('Order', orderSchema);

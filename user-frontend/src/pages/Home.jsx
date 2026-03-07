@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCart, CATEGORIES } from "../context/CartContext";
 import "./Home.css";
 
@@ -123,7 +123,8 @@ export default function Home({ onNext }) {
     const h = new Date().getHours();
     if (h < 12) return "Good morning";
     if (h < 18) return "Good afternoon";
-    return "Good evening";
+    if (h < 24) return "Good evening";
+    return "Good night";
   };
 
   // Filter items (search crosses all categories)

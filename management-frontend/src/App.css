@@ -28,7 +28,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #FFFFFF;
+  background: #fff;
   border-radius: 50px;
   padding: 16px 14px;
   width: 350px;
@@ -57,7 +57,7 @@
 
 /* Shared card */
 .card {
-  background: #FFFFFF;
+  background: #fff;
   border-radius: 10px;
   padding: 20px;
   box-shadow: var(--shadow);
@@ -138,7 +138,7 @@
 }
 
 .modal {
-  background: #FFFFFF;
+  background: #fff;
   border-radius: 10px;
   padding: 28px;
   width: 460px;
@@ -206,9 +206,8 @@
 }
 
 .pill.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
+  background: #d9d9d9;
+  color: black;
 }
 
 /* Select */

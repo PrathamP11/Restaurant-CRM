@@ -60,7 +60,7 @@ router.patch('/:id', async (req, res) => {
     const item = await MenuItem.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { returnDocument: 'after' }
     );
     res.json(item);
   } catch (err) {

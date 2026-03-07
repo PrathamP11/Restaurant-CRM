@@ -96,7 +96,7 @@
   width: 26px;
   height: 26px;
   border-radius: 20%;
-  background: #FFF;
+  background: #fff;
   border: 2px solid #d9d9d9;
   font-size: 17px;
   display: flex;
@@ -148,7 +148,7 @@
 }
 
 .ot-btn.active {
-  background: #FFFFFF;
+  background: #fff;
   color: black;
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -223,15 +223,6 @@
 }
 
 
-.yd-input {
-  border: none;
-  border-bottom: 1px solid var(--border);
-  outline: none;
-  padding: 6px 0;
-  font-size: 14px;
-  background: transparent;
-}
-
 /* Swipe */
 
 .swipe-wrap {
@@ -255,7 +246,7 @@
 .swipe-track {
   position: relative;
   height: 60px;
-  background: #FFF;
+  background: #fff;
   border-radius: 50px;
   display: flex;
   align-items: center;
@@ -306,7 +297,7 @@
 
 /* CI modal */
 .ci-textarea-wrap {
-  background-color: #FFFFFF;
+  background-color: #fff;
   border-radius: 10px;
   padding: 8px;
 }
@@ -345,7 +336,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #FFFFFF;
+  background-color: #fff;
   padding: 5px;
   border-radius: 10px;
   position: fixed;
@@ -382,8 +373,15 @@
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .checkout-error-toast p {
@@ -407,10 +405,15 @@
   height: 3px;
   background: #fff;
   border-radius: 0 3px 3px 0;
-  animation: timerShrink 5s linear forwards;
+  animation: timerShrink 3s linear forwards;
 }
 
 @keyframes timerShrink {
-  from { width: 100%; }
-  to   { width: 0%; }
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
 }

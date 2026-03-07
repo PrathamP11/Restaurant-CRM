@@ -34,7 +34,7 @@ export default function Tables() {
       if (popupRef.current) {
         const rect = popupRef.current.getBoundingClientRect();
         const spaceRight = window.innerWidth - rect.right;
-        setPopupBelow(spaceRight < 200);
+        setPopupBelow(spaceRight < 220);
       }
     }
     setShowPopup(v => !v);

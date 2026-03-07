@@ -81,7 +81,7 @@ router.patch('/:id', async (req, res) => {
     const table = await Table.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { returnDocument: 'after' }
     );
     res.json(table);
   } catch (err) {

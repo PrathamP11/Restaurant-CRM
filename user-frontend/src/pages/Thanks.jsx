@@ -4,7 +4,7 @@ import "./Thanks.css";
 
 export default function Thanks({ onDone }) {
   const { clearCart, setUser } = useCart();
-  const [count, setCount] = useState(5);
+  const [count, setCount] = useState(3);
 
   useEffect(() => {
     clearCart();

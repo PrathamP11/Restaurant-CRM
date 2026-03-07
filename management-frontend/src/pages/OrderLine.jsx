@@ -83,7 +83,7 @@ function OrderCard({ order, onStatusChange }) {
             <img src="/icons/fork.png" alt="order" className="ico" style={{ opacity: 0.6 }} />
             <div>
               <p className="oc-id"># {order.orderId?.replace("ORD-", "") || order._id?.slice(-4)}</p>
-              <p className="oc-meta">{order.type === "dine-in" ? `Table-0${order.tableNumber}` : "Takeaway"}</p>
+              <p className="oc-meta">{order.type === "dine-in" ? `Table-${String(order.tableNumber).padStart(2, "0")}` : "Takeaway"}</p>
               <p className="oc-meta">{formatOrderTime(order.createdAt)}</p>
             </div>
           </div>

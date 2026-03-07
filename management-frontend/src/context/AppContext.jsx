@@ -79,9 +79,11 @@ export function AppProvider({ children }) {
     setMenuItems(res.data);
   };
 
-  const addMenuItem = async (item) => {
+  const addMenuItem = async (formData) => {
     try {
-      await axios.post(`${API}/menu`, item);
+      await axios.post(`${API}/menu`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       await fetchMenu();
     } catch (err) {
       alert(err.response?.data?.message || "Error adding item");

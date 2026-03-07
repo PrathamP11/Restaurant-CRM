@@ -28,7 +28,7 @@ router.patch('/:id/increment', async (req, res) => {
     const chef = await Chef.findByIdAndUpdate(
       req.params.id,
       { $inc: { orders: 1 } },
-      { new: true }
+      { returnDocument: 'after' }
     );
     res.json(chef);
   } catch (err) {
