@@ -120,7 +120,7 @@ function MenuCard({ item, index, onDragStart, onDragOver, onDrop, isDragOver, fi
     >
       <div className="menu-img-box">
         {item.image
-          ? <img src={`http://localhost:5000${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="menu-img" />
+          ? <img src={`https://restaurant-crm-fhav.onrender.com${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="menu-img" />
           : <span className="menu-img-ph">Image</span>
         }
       </div>

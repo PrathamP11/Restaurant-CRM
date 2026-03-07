@@ -87,7 +87,7 @@ function ItemCard({ item }) {
     <div className="item-card">
       <div className="item-img-box">
         {item.image
-          ? <img src={`http://localhost:5000${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="item-img" />
+          ? <img src={`https://restaurant-crm-fhav.onrender.com${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="item-img" />
           : <div className="item-img-ph" />
         }
       </div>
