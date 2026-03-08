@@ -40,9 +40,7 @@ const menuItems = [
   { name: 'Indian Salad',description: 'Indian salad',            price: 92, averagePreparationTime: 2, category: 'Veggies',      stock: 35, order: 11, image: "/icons/Indian-salad.png" },
 ];
 async function seed() {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('MongoDB connected for seeding...');
+  try {console.log('MongoDB connected for seeding...');
 
     // Clear existing
     await Chef.deleteMany({});
