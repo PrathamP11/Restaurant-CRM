@@ -126,7 +126,7 @@ export default function Checkout({ onOrder, onBack }) {
               <p className="ci-price">₹ {item.price}</p>
             </div>
             <div className="ci-qty-side">
-              <button className="rm-btn" onClick={() => deleteItem(item._id)}><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>
+              <button className="rm-btn" onClick={() => { deleteItem(item._id); if (cartItems.length <= 1) onBack(); }}><svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>
               <div className="ci-qty-row">
                 <button className="qty-btn-co" disabled={qty <= 1} style={qty <= 1 ? { opacity: 0.4 } : {}} onClick={() => qty > 1 && removeItem(item._id)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>
                 <span className="qty-num-co">{qty}</span>
