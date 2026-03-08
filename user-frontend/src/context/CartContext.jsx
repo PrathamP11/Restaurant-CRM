@@ -3,7 +3,7 @@ import axios from "axios";
 
 const CartContext = createContext();
 
-const API = "https://restaurant-crm-fhav.onrender.com/api";
+const API = import.meta.env.VITE_API_URL;
 
 export const CATEGORIES = ["Burger", "Pizza", "Drink", "French fries", "Veggies"];
 

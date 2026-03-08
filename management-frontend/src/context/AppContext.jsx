@@ -3,7 +3,7 @@ import axios from "axios";
 
 const AppContext = createContext();
 
-const API = "https://restaurant-crm-fhav.onrender.com/api";
+const API = import.meta.env.VITE_API_URL;
 
 export function AppProvider({ children }) {
   const [menuItems, setMenuItems] = useState([]);
