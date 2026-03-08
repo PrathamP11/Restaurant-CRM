@@ -30,6 +30,9 @@ router.patch('/:id/increment', async (req, res) => {
       { $inc: { orders: 1 } },
       { returnDocument: 'after' }
     );
+    if (!chef) {
+      return res.status(404).json({ message: 'Chef not found.' });
+    }
     res.json(chef);
   } catch (err) {
     res.status(400).json({ message: err.message });

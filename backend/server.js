@@ -4,7 +4,9 @@ const cors       = require('cors');
 const dotenv     = require('dotenv');
 const path       = require('path');
 const fs         = require('fs');
-const seed       = require('./seed');
+// const seed       = require('./seed');
+const Order      = require('./models/Order');
+const Table      = require('./models/Table');
 
 dotenv.config();
 
@@ -18,7 +20,9 @@ if (!fs.existsSync(uploadDir)) {
 
 
 // ── Middleware ──────────────────────────────────────────
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+}));
 app.use(express.json());
 
 // ── Models (ensure Counter is registered before routes) ─
@@ -37,14 +41,14 @@ app.get('/', (req, res) => {
 
 
 
-app.get('/seed', async (req, res) => {
-  try {
-    await seed();
-    res.send('Database seeded successfully');
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
+// app.get('/seed', async (req, res) => {
+//   try {
+//     await seed();
+//     res.send('Database seeded successfully');
+//   } catch (err) {
+//     res.status(500).send(err.message);
+//   }
+// });
 
 
 // ── MongoDB Connection ───────────────────────────────────
@@ -55,6 +59,23 @@ mongoose
     app.listen(process.env.PORT || 5000, '0.0.0.0', () => {
       console.log(`Server running on port ${process.env.PORT || 5000}`);
     });
+
+    // Auto-complete expired processing orders every 10 seconds
+    setInterval(async () => {
+      try {
+        const now = new Date();
+        const expired = await Order.find({ status: 'processing', processingEndTime: { $lte: now } });
+        for (const order of expired) {
+          order.status = order.type === 'takeaway' ? 'not_picked' : 'done';
+          await order.save();
+          if (order.tableId) {
+            await Table.findByIdAndUpdate(order.tableId, { isReserved: false });
+          }
+        }
+      } catch (err) {
+        console.error('Auto-complete error:', err.message);
+      }
+    }, 10000);
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err.message);

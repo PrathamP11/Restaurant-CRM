@@ -106,7 +106,7 @@ function AddItemPage({ onBack }) {
 }
 
 /* ─── Menu Card ─── */
-function MenuCard({ item, index, onDragStart, onDragOver, onDrop, isDragOver, filter, onDelete }) {
+function MenuCard({ item, index, onDragStart, onDragOver, onDrop, onDragEnd, isDragOver, filter, onDelete }) {
   const isMatch = filter && item.name.toLowerCase().includes(filter.toLowerCase());
   const blur = filter && !isMatch;
 
@@ -117,6 +117,7 @@ function MenuCard({ item, index, onDragStart, onDragOver, onDrop, isDragOver, fi
       onDragStart={() => onDragStart(index)}
       onDragOver={(e) => { e.preventDefault(); onDragOver(index); }}
       onDrop={() => onDrop(index)}
+      onDragEnd={onDragEnd}
     >
       <div className="menu-img-box">
         {item.image
@@ -165,6 +166,7 @@ export default function Menu({ filter }) {
     dragFrom.current = null;
     setDragOver(null);
   };
+  const onDragEnd = () => { dragFrom.current = null; setDragOver(null); };
 
   // ── Show Add Item as a full page ──
   if (showAdd) {
@@ -195,6 +197,7 @@ export default function Menu({ filter }) {
             onDragStart={onDragStart}
             onDragOver={onDragOver}
             onDrop={onDrop}
+            onDragEnd={onDragEnd}
             isDragOver={dragOver === i}
             filter={filter}
             onDelete={deleteMenuItem}

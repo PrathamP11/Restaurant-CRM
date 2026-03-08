@@ -56,11 +56,16 @@ router.delete('/:id', async (req, res) => {
 
     // Renumber remaining tables sequentially (1, 2, 3...)
     const remaining = await Table.find().sort({ tableNumber: 1 });
-    for (let i = 0; i < remaining.length; i++) {
-      const newNum = i + 1;
-      remaining[i].tableNumber = newNum;
-      await remaining[i].save();
-    } 
+    if (remaining.length > 0) {
+      await Table.bulkWrite(
+        remaining.map((t, i) => ({
+          updateOne: {
+            filter: { _id: t._id },
+            update: { $set: { tableNumber: i + 1 } },
+          },
+        }))
+      );
+    }
 
     const updated = await Table.find().sort({ tableNumber: 1 });
     res.json(updated);
@@ -77,6 +82,9 @@ router.patch('/:id', async (req, res) => {
       req.body,
       { returnDocument: 'after' }
     );
+    if (!table) {
+      return res.status(404).json({ message: 'Table not found.' });
+    }
     res.json(table);
   } catch (err) {
     res.status(400).json({ message: err.message });

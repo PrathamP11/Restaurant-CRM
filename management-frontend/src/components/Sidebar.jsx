@@ -27,13 +27,14 @@ export default function Sidebar({ activePage, onNavigate }) {
             <img src={`/icons/${item.icon}.png`} alt={item.id} className="nav-icon" />
           </button>
         ))}
+      </nav>
+
       {/* Bottom admin dot */}
       <div className="sidebar-bottom">
         <div className="admin-dot">
           <img src="/icons/admin-avatar.png" alt="Admin" className="admin-avatar" />
         </div>
       </div>
-      </nav>
     </aside>
 
   );

@@ -18,10 +18,14 @@ export function AppProvider({ children }) {
 
     // Poll every 5 seconds — updates orders, tables, chefs, analytics live
     const t = setInterval(async () => {
-      await fetchOrders();
-      await fetchTables();
-      await fetchChefs();
-      await fetchAnalytics("daily");
+      try {
+        await fetchOrders();
+        await fetchTables();
+        await fetchChefs();
+        await fetchAnalytics("daily");
+      } catch (err) {
+        console.error('Polling error:', err.message);
+      }
     }, 5000);
 
     return () => clearInterval(t);

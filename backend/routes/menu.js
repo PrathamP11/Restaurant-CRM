@@ -54,6 +54,20 @@ router.post('/', upload.single('image'), async (req, res) => {
   }
 });
 
+// PATCH reorder — receives array of { id, order }
+router.patch('/reorder/bulk', async (req, res) => {
+  try {
+    const { items } = req.body;  // [{ id, order }, ...]
+    for (const item of items) {
+      await MenuItem.findByIdAndUpdate(item.id, { order: item.order });
+    }
+    const updated = await MenuItem.find().sort({ order: 1 });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // PATCH update menu item
 router.patch('/:id', async (req, res) => {
   try {
@@ -62,6 +76,9 @@ router.patch('/:id', async (req, res) => {
       req.body,
       { returnDocument: 'after' }
     );
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found.' });
+    }
     res.json(item);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -73,20 +90,6 @@ router.delete('/:id', async (req, res) => {
   try {
     await MenuItem.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// PATCH reorder — receives array of { id, order }
-router.patch('/reorder/bulk', async (req, res) => {
-  try {
-    const { items } = req.body;  // [{ id, order }, ...]
-    for (const item of items) {
-      await MenuItem.findByIdAndUpdate(item.id, { order: item.order });
-    }
-    const updated = await MenuItem.find().sort({ order: 1 });
-    res.json(updated);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

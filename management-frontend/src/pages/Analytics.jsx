@@ -174,6 +174,7 @@ export default function Analytics({ filter }) {
         takeaway: data.takeaway ?? 0,
       });
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderPeriod, orders]);
 
   // Re-fetch revenue when period changes
@@ -183,6 +184,7 @@ export default function Analytics({ filter }) {
       setRevenueData(data);
       setRevLabels(data.map(d => d.date));
     }).finally(() => setLoadingRev(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [revPeriod]);
 
   const blurAll = filter.length > 0;

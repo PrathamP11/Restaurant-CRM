@@ -44,10 +44,20 @@ router.get('/analytics', async (req, res) => {
     const takeaway = orders.filter(o => o.type === 'takeaway').length;
     const revenue = orders.reduce((s, o) => s + o.revenue, 0);
 
-    const allOrders = await Order.find();
-    const totalClients = new Set(allOrders.map(o => o.phone)).size;
-    const totalOrders = allOrders.length;
-    const totalRevenue = allOrders.reduce((s, o) => s + o.revenue, 0);
+    const [totals] = await Order.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          totalRevenue: { $sum: '$revenue' },
+          phones: { $addToSet: '$phone' },
+        },
+      },
+    ]);
+
+    const totalOrders = totals?.totalOrders || 0;
+    const totalRevenue = totals?.totalRevenue || 0;
+    const totalClients = totals?.phones?.length || 0;
 
     res.json({ served, dineIn, takeaway, revenue, totalClients, totalOrders, totalRevenue });
   } catch (err) {
@@ -58,7 +68,7 @@ router.get('/analytics', async (req, res) => {
 // GET revenue graph data
 router.get('/revenue', async (req, res) => {
   try {
-    const { period } = req.query; // daily | weekly | monthly | yearly
+    const { period } = req.query;
     const now = new Date();
     const data = [];
 
@@ -66,42 +76,54 @@ router.get('/revenue', async (req, res) => {
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     if (period === 'daily') {
-      // Last 7 days, one entry per day, labeled by day name
-      for (let i = 6; i >= 0; i--) {
-        const start = new Date(now);
-        start.setDate(start.getDate() - i);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(start);
-        end.setHours(23, 59, 59, 999);
+      const start = new Date(now);
+      start.setDate(start.getDate() - 6);
+      start.setHours(0, 0, 0, 0);
 
-        const orders = await Order.find({ createdAt: { $gte: start, $lte: end } });
-        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
-        data.push({ date: dayNames[start.getDay()], revenue });
+      const results = await Order.aggregate([
+        { $match: { createdAt: { $gte: start } } },
+        { $group: { _id: { $dayOfWeek: '$createdAt' }, revenue: { $sum: '$revenue' } } },
+      ]);
+      const revMap = {};
+      results.forEach(r => { revMap[r._id] = r.revenue; });
+
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dow = d.getDay() + 1; // $dayOfWeek is 1=Sun
+        data.push({ date: dayNames[d.getDay()], revenue: revMap[dow] || 0 });
       }
 
     } else if (period === 'weekly') {
-      // Weeks in the current month, each starting on Monday
       const year = now.getFullYear();
       const month = now.getMonth();
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month + 1, 0);
+
+      const results = await Order.aggregate([
+        { $match: { createdAt: { $gte: firstDay, $lte: new Date(lastDay.getTime() + 86399999) } } },
+        { $group: { _id: { $week: '$createdAt' }, revenue: { $sum: '$revenue' } } },
+      ]);
+      const revMap = {};
+      results.forEach(r => { revMap[r._id] = r.revenue; });
+
       let weekStart = new Date(firstDay);
       let week = 1;
-
       while (weekStart <= lastDay) {
         let weekEnd = new Date(weekStart);
-        // Find Sunday (end of week) or end of month
         const daysUntilSunday = (7 - weekStart.getDay()) % 7;
         weekEnd.setDate(weekEnd.getDate() + daysUntilSunday);
         if (weekEnd > lastDay) weekEnd = new Date(lastDay);
         weekEnd.setHours(23, 59, 59, 999);
-
         const start = new Date(weekStart);
         start.setHours(0, 0, 0, 0);
 
-        const orders = await Order.find({ createdAt: { $gte: start, $lte: weekEnd } });
-        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
-        data.push({ date: `W${week}`, revenue });
+        // Sum from aggregation results for this week's range
+        const weekOrders = await Order.aggregate([
+          { $match: { createdAt: { $gte: start, $lte: weekEnd } } },
+          { $group: { _id: null, revenue: { $sum: '$revenue' } } },
+        ]);
+        data.push({ date: `W${week}`, revenue: weekOrders[0]?.revenue || 0 });
 
         weekStart = new Date(weekEnd);
         weekStart.setDate(weekStart.getDate() + 1);
@@ -110,29 +132,35 @@ router.get('/revenue', async (req, res) => {
       }
 
     } else if (period === 'monthly') {
-      // 12 months of the current year
       const year = now.getFullYear();
+      const start = new Date(year, 0, 1);
+      const end = new Date(year, 11, 31, 23, 59, 59, 999);
+
+      const results = await Order.aggregate([
+        { $match: { createdAt: { $gte: start, $lte: end } } },
+        { $group: { _id: { $month: '$createdAt' }, revenue: { $sum: '$revenue' } } },
+      ]);
+      const revMap = {};
+      results.forEach(r => { revMap[r._id] = r.revenue; });
 
       for (let m = 0; m < 12; m++) {
-        const start = new Date(year, m, 1, 0, 0, 0, 0);
-        const end = new Date(year, m + 1, 0, 23, 59, 59, 999);
-
-        const orders = await Order.find({ createdAt: { $gte: start, $lte: end } });
-        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
-        data.push({ date: monthNames[m], revenue });
+        data.push({ date: monthNames[m], revenue: revMap[m + 1] || 0 });
       }
 
     } else if (period === 'yearly') {
-      // Last 10 years
       const currentYear = now.getFullYear();
+      const start = new Date(currentYear - 9, 0, 1);
+      const end = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+
+      const results = await Order.aggregate([
+        { $match: { createdAt: { $gte: start, $lte: end } } },
+        { $group: { _id: { $year: '$createdAt' }, revenue: { $sum: '$revenue' } } },
+      ]);
+      const revMap = {};
+      results.forEach(r => { revMap[r._id] = r.revenue; });
 
       for (let y = currentYear - 9; y <= currentYear; y++) {
-        const start = new Date(y, 0, 1, 0, 0, 0, 0);
-        const end = new Date(y, 11, 31, 23, 59, 59, 999);
-
-        const orders = await Order.find({ createdAt: { $gte: start, $lte: end } });
-        const revenue = orders.reduce((s, o) => s + o.revenue, 0);
-        data.push({ date: String(y), revenue });
+        data.push({ date: String(y), revenue: revMap[y] || 0 });
       }
     }
 
