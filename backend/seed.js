@@ -60,10 +60,8 @@ async function seed() {
     console.log(`   - ${tables.length} tables`);
     console.log(`   - ${menuItems.length} menu items`);
 
-    process.exit(0);
   } catch (err) {
     console.error('Seed error:', err.message);
-    process.exit(1);
   }
 }
 
