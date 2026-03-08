@@ -18,7 +18,7 @@ function calcRemaining(order) {
 }
 
 function useCountdown(order, onStatusChange) {
-  const remaining = calcRemaining(order);
+  const [remaining] = useState(() => calcRemaining(order));
 
   useEffect(() => {
     if (order.status === "processing" && remaining <= 0) {
