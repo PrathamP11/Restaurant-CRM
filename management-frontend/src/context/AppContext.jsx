@@ -16,10 +16,9 @@ export function AppProvider({ children }) {
   useEffect(() => {
     fetchAll();
 
-    // Poll every 5 seconds — updates orders, tables, chefs, analytics live
+    // Poll every 5 seconds — updates tables, chefs, analytics live (orders only on refresh)
     const t = setInterval(async () => {
       try {
-        await fetchOrders();
         await fetchTables();
         await fetchChefs();
         await fetchAnalytics("daily");
