@@ -4,7 +4,7 @@ const cors       = require('cors');
 const dotenv     = require('dotenv');
 const path       = require('path');
 const fs         = require('fs');
-// const seed       = require('./seed');
+const seed       = require('./seed');
 const Order      = require('./models/Order');
 const Table      = require('./models/Table');
 
@@ -41,14 +41,14 @@ app.get('/', (req, res) => {
 
 
 
-// app.get('/seed', async (req, res) => {
-//   try {
-//     await seed();
-//     res.send('Database seeded successfully');
-//   } catch (err) {
-//     res.status(500).send(err.message);
-//   }
-// });
+app.get('/seed', async (req, res) => {
+  try {
+    await seed();
+    res.send('Database seeded successfully');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 
 // ── MongoDB Connection ───────────────────────────────────
