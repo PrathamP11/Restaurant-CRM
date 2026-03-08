@@ -4,6 +4,7 @@ const cors       = require('cors');
 const dotenv     = require('dotenv');
 const path       = require('path');
 const fs         = require('fs');
+const seed       = require('./seed');
 
 dotenv.config();
 
@@ -20,6 +21,9 @@ if (!fs.existsSync(uploadDir)) {
 app.use(cors());
 app.use(express.json());
 
+// ── Models (ensure Counter is registered before routes) ─
+require('./models/Counter');
+
 // ── Routes ──────────────────────────────────────────────
 app.use('/api/chefs',    require('./routes/chefs'));
 app.use('/api/tables',   require('./routes/tables'));
@@ -29,6 +33,17 @@ app.use('/api/orders',   require('./routes/orders'));
 // ── Health check ────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({ message: 'Restaurant API is running' });
+});
+
+
+
+app.get('/seed', async (req, res) => {
+  try {
+    await seed();
+    res.send('Database seeded successfully');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 

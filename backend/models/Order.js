@@ -64,12 +64,16 @@ const orderSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-// Auto-generate orderId before saving
+// Auto-generate orderId before saving (atomic counter)
 orderSchema.pre('save', async function () {
   if (!this.orderId) {
-    const last = await mongoose.model('Order').findOne().sort({ createdAt: -1 }).select('orderId');
-    const lastNum = last?.orderId ? parseInt(last.orderId.replace('ORD-', ''), 10) : 1000;
-    this.orderId = `ORD-${lastNum + 1}`;
+    const Counter = mongoose.model('Counter');
+    const counter = await Counter.findByIdAndUpdate(
+      'orderId',
+      { $inc: { seq: 1 } },
+      { upsert: true, returnDocument: 'after' }
+    );
+    this.orderId = `ORD-${counter.seq}`;
   }
 });
 
