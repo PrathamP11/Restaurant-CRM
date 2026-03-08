@@ -4,9 +4,10 @@ const tableSchema = new mongoose.Schema({
   tableNumber: {
     type: Number,
     required: true,
+    unique: true,
   },
   name: {
-    type: String,
+    type: String, 
     default: 'Table',
   },
   chairs: {

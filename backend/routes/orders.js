@@ -184,7 +184,6 @@ router.post('/', async (req, res) => {
     const revenue = itemTotal + deliveryCharge + taxes;
     const totalPrepTime = Math.min(items.reduce((s, i) => s + (i.averagePreparationTime || 5) * i.qty, 0), 15);
     const processingTime = totalPrepTime * 60;
-    const processingEndTime = new Date(Date.now() + processingTime * 1000);
     const itemCount = items.reduce((s, i) => s + i.qty, 0);
 
     let assignedTableId = null;
@@ -222,7 +221,6 @@ router.post('/', async (req, res) => {
       revenue,
       chefId: chef._id,
       processingTime,
-      processingEndTime,
       status: 'processing',
     });
 

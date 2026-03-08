@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "../context/AppContext";
 import "./OrderLine.css";
 
@@ -104,7 +104,7 @@ function OrderCard({ order, onStatusChange }) {
 }
 
 export default function OrderLine() {
-  const { orders, updateOrderStatus, fetchOrders } = useApp();
+  const { orders, updateOrderStatus } = useApp();
   return (
     <>
       <h2 className="orderline-title">Order Line</h2>

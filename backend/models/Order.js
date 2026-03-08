@@ -53,10 +53,6 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  processingEndTime: {
-    type: Date,
-    default: null
-  },
   status: {
     type: String,
     enum: ['processing', 'done', 'not_picked'],
