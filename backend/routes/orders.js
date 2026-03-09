@@ -235,6 +235,8 @@ router.post('/', async (req, res) => {
       status: 'processing',
     });
 
+    await Chef.findByIdAndUpdate(chef._id, { $inc: { orders: 1 } });
+
     res.status(201).json(order);
   } catch (err) {
     res.status(400).json({ message: err.message });
