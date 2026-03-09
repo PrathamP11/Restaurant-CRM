@@ -68,7 +68,6 @@ export default function Checkout({ onOrder, onBack }) {
 
   const deliveryTime = 40;
 
-  // Refresh tables every time checkout opens
   useEffect(() => { fetchTables(); }, []);
 
   const handleSwipe = async () => {
@@ -107,7 +106,6 @@ export default function Checkout({ onOrder, onBack }) {
         <p className="greeting-sub">Place you order here</p>
       </div>
 
-      {/* Search (disabled on checkout) */}
       <div className="search-bar search-disabled" style={{ marginBottom: "14px" }}>
         <img src="/icons/search.png" alt="search" className="ico-sm" />
         <input placeholder="Search" disabled />
@@ -115,11 +113,10 @@ export default function Checkout({ onOrder, onBack }) {
 
 
       <div className="checkout-body">
-        {/* Cart items */}
         {cartItems.map(({ item, qty }) => (
           <div key={item._id} className="cart-item">
             <div className="ci-img-wrap">
-              {item.image ? <img src={`https://restaurant-crm-fhav.onrender.com${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="ci-img" /> : <div className="ci-img-ph" />}
+              {item.image ? <img src={`${import.meta.env.VITE_API_URL}${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="ci-img" /> : <div className="ci-img-ph" />}
             </div>
             <div className="ci-details">
               <p className="ci-name">{item.name}</p>
@@ -141,13 +138,11 @@ export default function Checkout({ onOrder, onBack }) {
         </button>
         {instructions && <p className="ci-preview">"{instructions}"</p>}
 
-        {/* Order type toggle */}
         <div className="order-type-toggle">
           <button className={`ot-btn ${orderType === "dine-in" ? "active" : ""}`} onClick={() => setOrderType("dine-in")}>Dine In</button>
           <button className={`ot-btn ${orderType === "takeaway" ? "active" : ""}`} onClick={() => setOrderType("takeaway")}>Take Away</button>
         </div>
 
-        {/* Bill */}
         <div className="bill-summary">
           <div className="bill-row"><span>Item Total</span><span>₹{cartTotal}.00</span></div>
           {orderType === "takeaway" && <div className="bill-row" ><span style={{ textDecoration: "underline dashed #817070", textUnderlineOffset: "5px" }}>Delivery Charge</span><span>₹50</span></div>}
@@ -158,7 +153,6 @@ export default function Checkout({ onOrder, onBack }) {
           </div>
         </div>
 
-        {/* Details */}
         <div className="your-details">
           <p className="yd-title">Your details</p>
           <p className="yd-info">{user?.name || "Guest"}, {user?.contact || "N/A"}</p>

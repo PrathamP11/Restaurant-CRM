@@ -3,17 +3,28 @@ const router = express.Router();
 const Order = require('../models/Order');
 const Table = require('../models/Table');
 const Chef = require('../models/Chef');
+const MenuItem = require('../models/MenuItem');
 
-// ── Helper: assign chef with fewest orders (random on tie) ──
 async function assignChef() {
   const chefs = await Chef.find();
   if (!chefs.length) return null;
-  const minOrders = Math.min(...chefs.map(c => c.orders));
-  const candidates = chefs.filter(c => c.orders === minOrders);
+
+  const counts = await Order.aggregate([
+    { $match: { status: 'processing' } },
+    { $group: { _id: '$chefId', count: { $sum: 1 } } },
+  ]);
+  const countMap = Object.fromEntries(counts.map(c => [c._id.toString(), c.count]));
+
+  const chefsWithCounts = chefs.map(c => ({
+    ...c.toObject(),
+    orders: countMap[c._id.toString()] || 0,
+  }));
+
+  const minOrders = Math.min(...chefsWithCounts.map(c => c.orders));
+  const candidates = chefsWithCounts.filter(c => c.orders === minOrders);
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-// GET all orders (newest first)
 router.get('/', async (req, res) => {
   try {
     const orders = await Order.find()
@@ -26,7 +37,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET analytics summary
 router.get('/analytics', async (req, res) => {
   try {
     const { period } = req.query;
@@ -40,7 +50,7 @@ router.get('/analytics', async (req, res) => {
     const orders = await Order.find({ createdAt: { $gte: since } });
 
     const served = orders.filter(o => o.status === 'done' && o.type === 'dine-in').length;
-    const dineIn = orders.filter(o => o.type === 'dine-in').length;
+    const dineIn = orders.filter(o => o.status !== 'done' && o.type === 'dine-in').length;
     const takeaway = orders.filter(o => o.type === 'takeaway').length;
     const revenue = orders.reduce((s, o) => s + o.revenue, 0);
 
@@ -65,7 +75,6 @@ router.get('/analytics', async (req, res) => {
   }
 });
 
-// GET revenue graph data
 router.get('/revenue', async (req, res) => {
   try {
     const { period } = req.query;
@@ -90,7 +99,7 @@ router.get('/revenue', async (req, res) => {
       for (let i = 6; i >= 0; i--) {
         const d = new Date(now);
         d.setDate(d.getDate() - i);
-        const dow = d.getDay() + 1; // $dayOfWeek is 1=Sun
+        const dow = d.getDay() + 1;
         data.push({ date: dayNames[d.getDay()], revenue: revMap[dow] || 0 });
       }
 
@@ -98,38 +107,30 @@ router.get('/revenue', async (req, res) => {
       const year = now.getFullYear();
       const month = now.getMonth();
       const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
+      const lastDay = new Date(year, month + 1, 0, 23, 59, 59, 999);
 
-      const results = await Order.aggregate([
-        { $match: { createdAt: { $gte: firstDay, $lte: new Date(lastDay.getTime() + 86399999) } } },
-        { $group: { _id: { $week: '$createdAt' }, revenue: { $sum: '$revenue' } } },
-      ]);
-      const revMap = {};
-      results.forEach(r => { revMap[r._id] = r.revenue; });
-
+      const weeks = [];
       let weekStart = new Date(firstDay);
-      let week = 1;
       while (weekStart <= lastDay) {
         let weekEnd = new Date(weekStart);
         const daysUntilSunday = (7 - weekStart.getDay()) % 7;
         weekEnd.setDate(weekEnd.getDate() + daysUntilSunday);
         if (weekEnd > lastDay) weekEnd = new Date(lastDay);
         weekEnd.setHours(23, 59, 59, 999);
-        const start = new Date(weekStart);
-        start.setHours(0, 0, 0, 0);
-
-        // Sum from aggregation results for this week's range
-        const weekOrders = await Order.aggregate([
-          { $match: { createdAt: { $gte: start, $lte: weekEnd } } },
-          { $group: { _id: null, revenue: { $sum: '$revenue' } } },
-        ]);
-        data.push({ date: `W${week}`, revenue: weekOrders[0]?.revenue || 0 });
-
+        weeks.push({ start: new Date(weekStart), end: weekEnd });
         weekStart = new Date(weekEnd);
         weekStart.setDate(weekStart.getDate() + 1);
         weekStart.setHours(0, 0, 0, 0);
-        week++;
       }
+
+      const orders = await Order.find({ createdAt: { $gte: firstDay, $lte: lastDay } });
+
+      weeks.forEach((w, i) => {
+        const revenue = orders
+          .filter(o => o.createdAt >= w.start && o.createdAt <= w.end)
+          .reduce((s, o) => s + o.revenue, 0);
+        data.push({ date: `W${i + 1}`, revenue });
+      });
 
     } else if (period === 'monthly') {
       const year = now.getFullYear();
@@ -170,13 +171,23 @@ router.get('/revenue', async (req, res) => {
   }
 });
 
-// POST create order
 router.post('/', async (req, res) => {
   try {
     const { type, items, customerName, phone, address, persons, cookingInstructions } = req.body;
 
     const chef = await assignChef();
     if (!chef) return res.status(400).json({ message: 'No chefs available.' });
+
+    for (const item of items) {
+      const menuItem = await MenuItem.findById(item.menuItemId);
+      if (!menuItem || menuItem.stock < item.qty) {
+        return res.status(400).json({ message: `${item.name} is out of stock.` });
+      }
+    }
+
+    for (const item of items) {
+      await MenuItem.findByIdAndUpdate(item.menuItemId, { $inc: { stock: -item.qty } });
+    }
 
     const itemTotal = items.reduce((s, i) => s + i.price * i.qty, 0);
     const deliveryCharge = type === 'takeaway' ? 50 : 0;
@@ -224,15 +235,12 @@ router.post('/', async (req, res) => {
       status: 'processing',
     });
 
-    await Chef.findByIdAndUpdate(chef._id, { $inc: { orders: 1 } });
-
     res.status(201).json(order);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
 
-// PATCH update order status
 router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;

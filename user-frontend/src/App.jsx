@@ -6,7 +6,7 @@ import Thanks from "./pages/Thanks";
 import "./App.css";
 
 export default function App() {
-  const [page, setPage] = useState("home");   // home | checkout | thanks
+  const [page, setPage] = useState("home");
 
   return (
     <CartProvider>

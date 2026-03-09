@@ -74,7 +74,6 @@ export default function Tables() {
           </div>
         ))}
 
-        {/* Add button */}
         {tables.length < 30 && (
           <div className="add-table-wrap" ref={popupRef}>
             <button className="add-table-btn" onClick={handleTogglePopup}>

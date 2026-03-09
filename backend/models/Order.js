@@ -30,7 +30,6 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  // Customer details
   customerName: { type: String, default: '' },
   phone: { type: String, default: '' },
   address: { type: String, default: '' },
@@ -42,13 +41,11 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  // Chef assigned
   chefId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Chef',
     default: null,
   },
-  // Processing countdown in seconds
   processingTime: {
     type: Number,
     default: 0,
@@ -60,7 +57,6 @@ const orderSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-// Auto-generate orderId before saving (atomic counter)
 orderSchema.pre('save', async function () {
   if (!this.orderId) {
     const Counter = mongoose.model('Counter');

@@ -10,7 +10,7 @@ export const CATEGORIES = ["Burger", "Pizza", "Drink", "French fries", "Veggies"
 export function CartProvider({ children }) {
   const [menu,    setMenu]    = useState([]);
   const [tables,  setTables]  = useState([]);
-  const [cart,    setCart]    = useState({});       // { itemId: qty }
+  const [cart,    setCart]    = useState({});
   const [user,    setUser]    = useState(null);
   const [orderInstructions, setOrderInstructions] = useState("");
   const [loadingMenu, setLoadingMenu] = useState(true);
@@ -61,7 +61,6 @@ export function CartProvider({ children }) {
   const cartTotal = cartItems.reduce((s, { item, qty }) => s + item.price * qty, 0);
   const cartCount = cartItems.reduce((s, { qty }) => s + qty, 0);
 
-  // Place order — called from Checkout on swipe
   const placeOrder = async ({ type, customerName, phone, address, persons, cookingInstructions }) => {
     const items = cartItems.map(({ item, qty }) => ({
       menuItemId:             item._id,

@@ -3,14 +3,11 @@ const router = express.Router();
 const Table = require('../models/Table');
 const Order = require('../models/Order');
 
-// GET all tables — sync reservation status with active orders
 router.get('/', async (req, res) => {
   try {
-    // Find tables that actually have active (processing) dine-in orders
     const activeOrders = await Order.find({ type: 'dine-in', status: 'processing' });
     const activeTableIds = new Set(activeOrders.map(o => o.tableId?.toString()).filter(Boolean));
 
-    // Unreserve tables with no active orders, reserve ones that do
     await Table.updateMany(
       { _id: { $nin: [...activeTableIds] } },
       { isReserved: false }
@@ -23,7 +20,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST create new table
 router.post('/', async (req, res) => {
   try {
     const count = await Table.countDocuments();
@@ -40,8 +36,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// DELETE a table — reserved tables cannot be deleted
-// After delete, renumber all remaining tables sequentially
 router.delete('/:id', async (req, res) => {
   try {
     const table = await Table.findById(req.params.id);
@@ -54,7 +48,6 @@ router.delete('/:id', async (req, res) => {
 
     await Table.findByIdAndDelete(req.params.id);
 
-    // Renumber remaining tables sequentially (1, 2, 3...)
     const remaining = await Table.find().sort({ tableNumber: 1 });
     if (remaining.length > 0) {
       await Table.bulkWrite(
@@ -74,7 +67,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// PATCH update table (reserve/unreserve)
 router.patch('/:id', async (req, res) => {
   try {
     const table = await Table.findByIdAndUpdate(

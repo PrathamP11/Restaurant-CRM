@@ -15,7 +15,7 @@ const menuItemSchema = new mongoose.Schema({
     required: true,
   },
   averagePreparationTime: {
-    type: Number,   // in minutes
+    type: Number,
     default: 15,
   },
   category: {
@@ -27,11 +27,11 @@ const menuItemSchema = new mongoose.Schema({
     default: 0,
   },
   image: {
-    type: String,   // URL or base64
+    type: String,
     default: '',
   },
   order: {
-    type: Number,   // for drag & drop position
+    type: Number,
     default: 0,
   },
 }, { timestamps: true });

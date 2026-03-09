@@ -4,7 +4,6 @@ const MenuItem = require('../models/MenuItem');
 const multer = require('multer');
 const path = require('path');
 
-// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/uploads/');
@@ -17,7 +16,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -29,7 +28,6 @@ const upload = multer({
   }
 });
 
-// GET all menu items (sorted by drag & drop order)
 router.get('/', async (req, res) => {
   try {
     const items = await MenuItem.find().sort({ order: 1, createdAt: 1 });
@@ -39,7 +37,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST create menu item
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     const count = await MenuItem.countDocuments();
@@ -54,10 +51,9 @@ router.post('/', upload.single('image'), async (req, res) => {
   }
 });
 
-// PATCH reorder — receives array of { id, order }
 router.patch('/reorder/bulk', async (req, res) => {
   try {
-    const { items } = req.body;  // [{ id, order }, ...]
+    const { items } = req.body;
     for (const item of items) {
       await MenuItem.findByIdAndUpdate(item.id, { order: item.order });
     }
@@ -68,7 +64,6 @@ router.patch('/reorder/bulk', async (req, res) => {
   }
 });
 
-// PATCH update menu item
 router.patch('/:id', async (req, res) => {
   try {
     const item = await MenuItem.findByIdAndUpdate(
@@ -85,7 +80,6 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-// DELETE menu item
 router.delete('/:id', async (req, res) => {
   try {
     await MenuItem.findByIdAndDelete(req.params.id);

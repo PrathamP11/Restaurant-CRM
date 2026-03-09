@@ -18,22 +18,18 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 
-// ── Middleware ──────────────────────────────────────────
 app.use(cors({
   origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
 }));
 app.use(express.json());
 
-// ── Models (ensure Counter is registered before routes) ─
 require('./models/Counter');
 
-// ── Routes ──────────────────────────────────────────────
 app.use('/api/chefs', require('./routes/chefs'));
 app.use('/api/tables', require('./routes/tables'));
 app.use('/api/menu', require('./routes/menu'));
 app.use('/api/orders', require('./routes/orders'));
 
-// ── Health check ────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({ message: 'Restaurant API is running' });
 });
@@ -42,8 +38,6 @@ app.get('/ping', (req, res) => {
   res.send('ok');
 });
 
-
-// ── MongoDB Connection ───────────────────────────────────
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {

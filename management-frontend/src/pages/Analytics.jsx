@@ -165,7 +165,6 @@ export default function Analytics({ filter }) {
   const [revLabels, setRevLabels] = useState([]);
   const [loadingRev, setLoadingRev] = useState(false);
 
-  // Re-fetch order summary when period or orders change
   useEffect(() => {
     fetchAnalytics(orderPeriod.toLowerCase()).then(data => {
       setPeriodData({
@@ -177,7 +176,6 @@ export default function Analytics({ filter }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderPeriod, orders]);
 
-  // Re-fetch revenue when period changes
   useEffect(() => {
     setLoadingRev(true);
     fetchRevenue(revPeriod.toLowerCase()).then(data => {
@@ -195,7 +193,6 @@ export default function Analytics({ filter }) {
     <div className="analytics-page">
       <h2 className="analytics-title">Analytics</h2>
 
-      {/* Stat Cards */}
       <div className="stat-row">
         {[
           { icon: "chef", value: "04", label: "TOTAL CHEF" },
@@ -209,10 +206,7 @@ export default function Analytics({ filter }) {
         ))}
       </div>
 
-      {/* Middle Row */}
       <div className="middle-row">
-
-        {/* Order Summary */}
         <div className={`card order-summary-card ${isBlurred("order summary")}`}>
           <div className="card-head">
             <span className="card-title">Order Summary</span>
@@ -239,7 +233,6 @@ export default function Analytics({ filter }) {
           <Donut served={periodData.served} dineIn={periodData.dineIn} takeaway={periodData.takeaway} />
         </div>
 
-        {/* Revenue */}
         <div className={`card revenue-card ${isBlurred("revenue")}`}>
           <div className="card-head">
             <span className="card-title">Revenue</span>
@@ -255,13 +248,11 @@ export default function Analytics({ filter }) {
           }
         </div>
 
-        {/* Tables */}
         <div className={`card ${isBlurred("tables")}`}>
           <TablesMini tables={tables} filter={filter} />
         </div>
       </div>
 
-      {/* Chef Table */}
       <div className="chef-table-card">
         <table className="chef-table">
           <thead>

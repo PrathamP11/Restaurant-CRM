@@ -87,7 +87,7 @@ function ItemCard({ item }) {
     <div className="item-card">
       <div className="item-img-box">
         {item.image
-          ? <img src={`https://restaurant-crm-fhav.onrender.com${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="item-img" />
+          ? <img src={`${import.meta.env.VITE_API_URL}${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="item-img" />
           : <div className="item-img-ph" />
         }
       </div>
@@ -127,8 +127,8 @@ export default function Home({ onNext }) {
     return "Good night";
   };
 
-  // Filter items (search crosses all categories)
   const filtered = menu.filter(m => {
+    if (m.stock <= 0) return false;
     const matchSearch = !search || m.name.toLowerCase().includes(search.toLowerCase());
     const matchCat = !category || m.category === category;
     return search ? matchSearch : matchCat && matchSearch;
@@ -137,7 +137,6 @@ export default function Home({ onNext }) {
   const visible = filtered.slice(0, visibleN);
   const hasMore = visibleN < filtered.length;
 
-  // Infinite scroll observer
   useEffect(() => {
     if (!loaderRef.current) return;
     const obs = new IntersectionObserver(([e]) => {
@@ -147,20 +146,17 @@ export default function Home({ onNext }) {
     return () => obs.disconnect();
   }, [hasMore]);
 
-  // Reset visible on filter change
   useEffect(() => { setVisibleN(PAGE_SIZE); }, [category, search]);
 
   const catTitle = !category ? (search ? "Results" : "All Items") : category;
 
   return (
     <div className="screen home-screen">
-      {/* Header */}
       <div className="page-header">
         <p className="greeting-big">{getGreeting()}</p>
-        <p className="greeting-sub">Place you order here</p>
+        <p className="greeting-sub">Place your order here</p>
       </div>
 
-      {/* Search */}
       <div className={`search-bar ${!user ? "blurred-search" : ""}`}>
         <img src="/icons/search.png" alt="search" className="ico-sm" />
         <input
@@ -171,14 +167,12 @@ export default function Home({ onNext }) {
         />
       </div>
 
-      {/* Categories (horizontal scroll) */}
       <div className="cats-row">
         {CATEGORIES.map(c => (
           <CategoryPill key={c} cat={c} active={category === c} onClick={() => setCategory(category === c ? null : c)} />
         ))}
       </div>
 
-      {/* Section title */}
       <div className="home-items-wrap">
         <h3 className="home-section-title">{catTitle}</h3>
         <div className="items-grid">
@@ -187,7 +181,6 @@ export default function Home({ onNext }) {
         {hasMore && <div ref={loaderRef} className="load-more-trigger" />}
       </div>
 
-      {/* Next button */}
       {cartCount > 0 && (
         <div className="next-bar">
           <button className="btn-round next-btn" onClick={onNext}>
@@ -196,7 +189,6 @@ export default function Home({ onNext }) {
         </div>
       )}
 
-      {/* Login modal (shown first) */}
       {!user && <LoginModal onSubmit={setUser} />}
     </div>
   );

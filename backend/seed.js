@@ -10,10 +10,10 @@ dotenv.config();
 
 
 const chefs = [
-  { name: 'Manesh', orders: 0 },
-  { name: 'Pritam', orders: 0 },
-  { name: 'Yash',   orders: 0 },
-  { name: 'Tenzen', orders: 0 },
+  { name: 'Manesh' },
+  { name: 'Pritam' },
+  { name: 'Yash' },
+  { name: 'Tenzen' },
 ];
 
 const tables = Array.from({ length: 30 }, (_, i) => {
@@ -42,13 +42,11 @@ const menuItems = [
 async function seed() {
   try {console.log('MongoDB connected for seeding...');
 
-    // Clear existing
     await Chef.deleteMany({});
     await Table.deleteMany({});
     await MenuItem.deleteMany({});
     await Order.deleteMany({});
 
-    // Insert fresh
     await Chef.insertMany(chefs);
     await Table.insertMany(tables);
     await MenuItem.insertMany(menuItems);

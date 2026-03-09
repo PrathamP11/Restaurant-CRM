@@ -16,7 +16,6 @@ export function AppProvider({ children }) {
   useEffect(() => {
     fetchAll();
 
-    // Poll every 5 seconds — updates orders, tables, chefs, analytics live
     const t = setInterval(async () => {
       try {
         await fetchOrders();
@@ -31,7 +30,6 @@ export function AppProvider({ children }) {
     return () => clearInterval(t);
   }, []);
 
-  // ── Called once on mount —
   const fetchAll = async () => {
     setLoading(true);
     try {
@@ -47,13 +45,11 @@ export function AppProvider({ children }) {
     }
   };
 
-  // ── Chefs ────────────────────────────────────────────────
   const fetchChefs = async () => {
     const res = await axios.get(`${API}/chefs`);
     setChefs(res.data);
   };
 
-  // ── Tables ───────────────────────────────────────────────
   const fetchTables = async () => {
     const res = await axios.get(`${API}/tables`);
     setTables(res.data);
@@ -77,7 +73,6 @@ export function AppProvider({ children }) {
     }
   };
 
-  // ── Menu ─────────────────────────────────────────────────
   const fetchMenu = async () => {
     const res = await axios.get(`${API}/menu`);
     setMenuItems(res.data);
@@ -116,9 +111,6 @@ export function AppProvider({ children }) {
     }
   };
 
-  // ── Orders ───────────────────────────────────────────────
-
-  // Normal fetch — used by polling, no side effects on DB
   const fetchOrders = async () => {
     const res = await axios.get(`${API}/orders`);
     setOrders(res.data);
@@ -137,7 +129,6 @@ export function AppProvider({ children }) {
     }
   };
 
-  // ── Analytics ────────────────────────────────────────────
   const fetchAnalytics = async (period = "daily") => {
     const res = await axios.get(`${API}/orders/analytics?period=${period}`);
     setAnalytics(res.data);

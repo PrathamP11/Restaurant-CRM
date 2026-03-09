@@ -10,12 +10,10 @@ const NAV = [
 export default function Sidebar({ activePage, onNavigate }) {
   return (
     <aside className="sidebar">
-      {/* Logo */}
       <div className="sidebar-logo">
         <img src="/icons/logo.png" alt="Logo" className="logo-icon" />
       </div>
 
-      {/* Nav items */}
       <nav className="sidebar-nav">
         {NAV.map((item) => (
           <button
@@ -29,7 +27,6 @@ export default function Sidebar({ activePage, onNavigate }) {
         ))}
       </nav>
 
-      {/* Bottom admin dot */}
       <div className="sidebar-bottom">
         <div className="admin-dot">
           <img src="/icons/admin-avatar.png" alt="Admin" className="admin-avatar" />
