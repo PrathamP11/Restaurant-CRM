@@ -21,6 +21,7 @@ export function AppProvider({ children }) {
         await fetchOrders();
         await fetchTables();
         await fetchChefs();
+        await fetchMenu();
         await fetchAnalytics("daily");
       } catch (err) {
         console.error('Polling error:', err.message);
