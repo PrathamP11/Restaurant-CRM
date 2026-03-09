@@ -8,7 +8,6 @@ router.get('/', async (_req, res) => {
     const chefs = await Chef.find().sort({ createdAt: 1 });
 
     const counts = await Order.aggregate([
-      { $match: { status: 'processing' } },
       { $group: { _id: '$chefId', count: { $sum: 1 } } },
     ]);
     const countMap = Object.fromEntries(counts.map(c => [c._id.toString(), c.count]));

@@ -50,7 +50,7 @@ router.get('/analytics', async (req, res) => {
     const orders = await Order.find({ createdAt: { $gte: since } });
 
     const served = orders.filter(o => o.status === 'done' && o.type === 'dine-in').length;
-    const dineIn = orders.filter(o => o.status !== 'done' && o.type === 'dine-in').length;
+    const dineIn = orders.filter(o => o.type === 'dine-in').length;
     const takeaway = orders.filter(o => o.type === 'takeaway').length;
     const revenue = orders.reduce((s, o) => s + o.revenue, 0);
 
