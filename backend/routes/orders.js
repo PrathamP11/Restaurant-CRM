@@ -248,6 +248,8 @@ router.patch('/:id/status', async (req, res) => {
     const { status } = req.body;
     const order = await Order.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' });
 
+    if (!order) return res.status(404).json({ message: 'Order not found.' });
+
     if ((status === 'done' || status === 'not_picked') && order.tableId) {
       await Table.findByIdAndUpdate(order.tableId, { isReserved: false });
     }
