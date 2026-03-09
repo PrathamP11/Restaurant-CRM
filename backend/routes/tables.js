@@ -3,7 +3,7 @@ const router = express.Router();
 const Table = require('../models/Table');
 const Order = require('../models/Order');
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const activeOrders = await Order.find({ type: 'dine-in', status: 'processing' });
     const activeTableIds = new Set(activeOrders.map(o => o.tableId?.toString()).filter(Boolean));

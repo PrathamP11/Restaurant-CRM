@@ -25,7 +25,7 @@ async function assignChef() {
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const orders = await Order.find()
       .populate('chefId', 'name')

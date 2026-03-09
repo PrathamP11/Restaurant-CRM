@@ -3,7 +3,7 @@ const router = express.Router();
 const Chef = require('../models/Chef');
 const Order = require('../models/Order');
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const chefs = await Chef.find().sort({ createdAt: 1 });
 
