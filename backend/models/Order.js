@@ -8,6 +8,7 @@ const orderItemSchema = new mongoose.Schema({
   name: { type: String },
   price: { type: Number },
   qty: { type: Number, default: 1 },
+  averagePreparationTime: { type: Number, default: 5 },
 });
 
 const orderSchema = new mongoose.Schema({
@@ -55,17 +56,11 @@ const orderSchema = new mongoose.Schema({
     enum: ['processing', 'done', 'not_picked'],
     default: 'processing',
   },
-}, { timestamps: true });
 
-orderSchema.pre('save', async function () {
+}, { timestamps: true });
+orderSchema.pre('save', function () {
   if (!this.orderId) {
-    const Counter = mongoose.model('Counter');
-    const counter = await Counter.findByIdAndUpdate(
-      'orderId',
-      { $inc: { seq: 1 } },
-      { upsert: true, returnDocument: 'after' }
-    );
-    this.orderId = `ORD-${counter.seq}`;
+    this.orderId = `ORD-${this._id.toString().slice(-4).toUpperCase()}`;
   }
 });
 

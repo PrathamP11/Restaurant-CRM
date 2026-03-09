@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 dotenv.config();
-// const seed = require('./seed');
+const seed = require('./seed');
 
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
@@ -21,8 +21,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-require('./models/Counter');
-
 app.use('/api/chefs', require('./routes/chefs'));
 app.use('/api/tables', require('./routes/tables'));
 app.use('/api/menu', require('./routes/menu'));
@@ -36,14 +34,14 @@ app.get('/ping', (_req, res) => {
   res.send('ok');
 });
 
-// app.get('/seed', async (_req, res) => {
-//   try {
-//     await seed();
-//     res.send('Database seeded successfully');
-//   } catch (err) {
-//     res.status(500).send(err.message);
-//   }
-// });
+app.get('/seed', async (_req, res) => {
+  try {
+    await seed();
+    res.send('Database seeded successfully');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 mongoose
   .connect(process.env.MONGO_URI)

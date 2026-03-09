@@ -4,7 +4,6 @@ const Chef = require('./models/Chef');
 const Table = require('./models/Table');
 const MenuItem = require('./models/MenuItem');
 const Order = require('./models/Order');
-const Counter = require('./models/Counter');
 
 dotenv.config();
 
@@ -48,7 +47,6 @@ async function seed() {
     await Table.deleteMany({});
     await MenuItem.deleteMany({});
     await Order.deleteMany({});
-    await Counter.deleteMany({});
 
     await Chef.insertMany(chefs);
     await Table.insertMany(tables);
