@@ -1,11 +1,11 @@
-const express    = require('express');
-const mongoose   = require('mongoose');
-const cors       = require('cors');
-const dotenv     = require('dotenv');
-const path       = require('path');
-const fs         = require('fs');
-const Order      = require('./models/Order');
-const Table      = require('./models/Table');
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const path = require('path');
+const fs = require('fs');
+const Order = require('./models/Order');
+const Table = require('./models/Table');
 
 dotenv.config();
 
@@ -28,16 +28,19 @@ app.use(express.json());
 require('./models/Counter');
 
 // ── Routes ──────────────────────────────────────────────
-app.use('/api/chefs',    require('./routes/chefs'));
-app.use('/api/tables',   require('./routes/tables'));
-app.use('/api/menu',     require('./routes/menu'));
-app.use('/api/orders',   require('./routes/orders'));
+app.use('/api/chefs', require('./routes/chefs'));
+app.use('/api/tables', require('./routes/tables'));
+app.use('/api/menu', require('./routes/menu'));
+app.use('/api/orders', require('./routes/orders'));
 
 // ── Health check ────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({ message: 'Restaurant API is running' });
 });
 
+app.get('/ping', (req, res) => {
+  res.send('ok');
+});
 
 
 // ── MongoDB Connection ───────────────────────────────────
