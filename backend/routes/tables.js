@@ -6,10 +6,14 @@ const Order = require('../models/Order');
 router.get('/', async (_req, res) => {
   try {
     const activeOrders = await Order.find({ type: 'dine-in', status: 'processing' });
-    const activeTableIds = new Set(activeOrders.map(o => o.tableId?.toString()).filter(Boolean));
+    const activeTableIds = activeOrders.map(o => o.tableId).filter(Boolean);
 
     await Table.updateMany(
-      { _id: { $nin: [...activeTableIds] } },
+      { _id: { $in: activeTableIds } },
+      { isReserved: true }
+    );
+    await Table.updateMany(
+      { _id: { $nin: activeTableIds } },
       { isReserved: false }
     );
 
