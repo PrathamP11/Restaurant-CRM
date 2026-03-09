@@ -121,7 +121,7 @@ function MenuCard({ item, index, onDragStart, onDragOver, onDrop, onDragEnd, isD
     >
       <div className="menu-img-box">
         {item.image
-          ? <img src={`${import.meta.env.VITE_API_URL}${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="menu-img" />
+          ? <img src={`${import.meta.env.VITE_API_URL.replace(/\/api$/, '')}${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="menu-img" />
           : <span className="menu-img-ph">Image</span>
         }
       </div>

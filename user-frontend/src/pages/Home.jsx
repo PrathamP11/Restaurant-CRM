@@ -87,7 +87,7 @@ function ItemCard({ item }) {
     <div className="item-card">
       <div className="item-img-box">
         {item.image
-          ? <img src={`${import.meta.env.VITE_API_URL}${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="item-img" />
+          ? <img src={`${import.meta.env.VITE_API_URL.replace(/\/api$/, '')}${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="item-img" />
           : <div className="item-img-ph" />
         }
       </div>

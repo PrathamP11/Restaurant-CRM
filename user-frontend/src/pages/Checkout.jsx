@@ -116,7 +116,7 @@ export default function Checkout({ onOrder, onBack }) {
         {cartItems.map(({ item, qty }) => (
           <div key={item._id} className="cart-item">
             <div className="ci-img-wrap">
-              {item.image ? <img src={`${import.meta.env.VITE_API_URL}${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="ci-img" /> : <div className="ci-img-ph" />}
+              {item.image ? <img src={`${import.meta.env.VITE_API_URL.replace(/\/api$/, '')}${item.image.startsWith('/') ? '' : '/'}${item.image}`} alt={item.name} className="ci-img" /> : <div className="ci-img-ph" />}
             </div>
             <div className="ci-details">
               <p className="ci-name">{item.name}</p>
